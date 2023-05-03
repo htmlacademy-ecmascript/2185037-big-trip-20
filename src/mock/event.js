@@ -7,29 +7,29 @@ const mockEvents = [
     basePrice: 800,
     dateFrom: '2019-07-10T22:55:56.845Z',
     dateTo: '2019-07-11T11:22:13.375Z',
-    destination: 1,
+    destination: '1',
     isFavorite: true,
     offers: [],
-    type: getRandomArrayElement(TYPES_EVENT)
+    type: 'drive'
   },
   {
     id: '2',
     basePrice: 1100,
     dateFrom: '2019-07-10T22:55:56.845Z',
     dateTo: '2019-07-11T11:22:13.375Z',
-    destination: 2,
+    destination: '2',
     isFavorite: false,
-    offers: [2],
-    type: 'taxi'
+    offers: ['2'],
+    type: 'bus'
   },
   {
     id: '3',
     basePrice: 2200,
     dateFrom: '2019-07-10T22:55:56.845Z',
     dateTo: '2019-07-11T11:22:13.375Z',
-    destination: 2,
+    destination: '3',
     isFavorite: true,
-    offers: [1,3],
+    offers: ['1','3'],
     type: 'taxi'
   }
 ];
@@ -81,26 +81,46 @@ const mockOffers = [
         id: '1',
         title: 'Upgrade to a business class',
         price: 20
-      }
-    ]
-  },
-  {
-    type: 'taxi',
-    offers: [
+      },
       {
         id: '2',
-        title: 'aaa a aa a',
-        price: 120
+        title: 'Book tickets',
+        price: 30
+      },
+      {
+        id: '3',
+        title: 'Rent a car',
+        price: 190
       }
     ]
   },
   {
-    type: 'taxi',
+    type: 'drive',
     offers: [
       {
-        id: '3',
-        title: 'bbb b b b',
+        id: '1',
+        title: 'Add luggage',
+        price: 120
+      },
+      {
+        id: '2',
+        title: 'Switch to comfort',
+        price: 90
+      }
+    ]
+  },
+  {
+    type: 'bus',
+    offers: [
+      {
+        id: '1',
+        title: 'Add breakfast',
         price: 200
+      },
+      {
+        id: '2',
+        title: 'Lunch in city',
+        price: 111
       }
     ]
   }
