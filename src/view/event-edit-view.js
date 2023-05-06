@@ -34,7 +34,7 @@ function createDestinationList(event, destinations, type){
 }
 
 function createEventEditTemplate(event, destinations, offers){
-  console.log(event);
+  // console.log(event);
   const {basePrice, dateFrom, dateTo, isFavorite, type} = event;
   return (
     `<li class="trip-events__item">
@@ -137,11 +137,10 @@ function createEventEditTemplate(event, destinations, offers){
 }
 
 export default class EventEditView {
-  constructor(event, destinations, offersData){
+  constructor({event, destinations, offers}){
     this.event = event;
     this.destinations = destinations;
-    const offersFinded = offersData.find((offers) => offers.type === this.event.type);
-    this.offers = offersFinded.offers.filter((offer) => this.event.offers.find((element) => offer.id === element));
+    this.offers = offers;
   }
 
   getTemplate(){

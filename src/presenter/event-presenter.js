@@ -25,13 +25,18 @@ export default class EventPresenter {
   init(){
     render(new SortView(), this.eventContainer);
     render(this.eventListComponent, this.eventContainer);
-    // render(new EventEditView(events[0]), this.eventListComponent.getElement());
+    render(new EventEditView({
+      event: this.events[0],
+      destinations: this.destinationsModel.get(),
+      offers: this.offersModel.get()
+    }), this.eventListComponent.getElement());
 
     this.events.forEach((item) => {
+      const offersByType = this.offersModel.getByType(item.type);
       render(new EventView({
         event: item,
         destination: this.destinationsModel.getById(item.destination),
-        offer: this.offersModel
+        offers: this.offersModel.getByIds(offersByType, item.offers)
       }), this.eventListComponent.getElement());
     });
   }

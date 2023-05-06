@@ -5,7 +5,7 @@ import { createElement } from '../render.js';
 function createOffersTemplate(offers){
   return (
     `<ul class="event__selected-offers">
-      ${offers.map((offer) => (
+      ${ offers[0] === undefined ? '' : offers.map((offer) => (
       `<li class="event__offer">
         <span class="event__offer-title">${offer.title}</span>
         &plus;&euro;&nbsp;
@@ -59,13 +59,13 @@ function createEventTemplate(event, destination, offers){
 }
 
 export default class EventView {
-  constructor({event, destination, offer}){
+  constructor({event, destination, offers}){
     this.event = event;
     this.destination = destination;
-    this.offer = offer;
+    this.offers = [offers];
   }
 
-  async getTemplate(){
+  getTemplate(){
     return createEventTemplate(this.event, this.destination, this.offers);
   }
 
