@@ -1,21 +1,10 @@
-import { getRandomEvent, mockDestinations, mockOffers } from '../mock/event.js';
+export default class EventModel {
+  constructor(service){
+    this.service = service;
+    this.events = this.service.getEvents();
+  }
 
-const EVENT_COUNT = 9;
-
-export default class EventsModel {
-  events = Array.from({length: EVENT_COUNT}, getRandomEvent);
-  destinations = mockDestinations;
-  offers = mockOffers;
-
-  getEvents(){
+  get(){
     return this.events;
-  }
-
-  getDestinations(){
-    return this.destinations;
-  }
-
-  getOffers(){
-    return this.offers;
   }
 }

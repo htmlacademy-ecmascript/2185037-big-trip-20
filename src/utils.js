@@ -1,4 +1,5 @@
 import dayjs from 'dayjs';
+import duration from 'dayjs/plugin/duration';
 
 const DATE_FORMAT = 'DD/MM/YY HH:mm';
 const DAY_FORMAT = 'MMM D';

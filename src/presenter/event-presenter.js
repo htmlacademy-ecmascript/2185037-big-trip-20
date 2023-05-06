@@ -8,24 +8,35 @@ import { render } from '../render.js';
 export default class EventPresenter {
   eventListComponent = new EventListView();
 
-  constructor({eventContainer, eventsModel}){
+  constructor({
+    eventContainer,
+    destinationsModel,
+    offersModel,
+    eventsModel
+  }){
     this.eventContainer = eventContainer;
+
+    this.destinationsModel = destinationsModel;
+    this.offersModel = offersModel;
     this.eventsModel = eventsModel;
+
+    this.events = eventsModel.get();
   }
 
   init(){
-    this.events = [...this.eventsModel.getEvents()];
-    this.destinations = [...this.eventsModel.getDestinations()];
-    this.offers = [...this.eventsModel.getOffers()];
-
     render(new SortView(), this.eventContainer);
     render(this.eventListComponent, this.eventContainer);
-    render(new EventEditView(this.events[0], this.destinations, this.offers), this.eventListComponent.getElement());
-    render(new EventNewView(this.events[1], this.destinations, this.offers), this.eventListComponent.getElement());
 
-    for (let i = 2; i < this.events.length; i++) {
-      render(new EventView(this.events[i],this.destinations, this.offers), this.eventListComponent.getElement());
-    }
+    render(new EventEditView(this.events[0]), this.eventListComponent.getElement());
 
+    this.events.forEach((item) => {
+      console.log(item);
+
+      render(new EventView({
+        event: item,
+        destination: this.destinationsModel.getById(item.destination),
+        offer: this.offers
+      }), this.eventListComponent.getElement());
+    });
   }
 }

@@ -1,5 +1,6 @@
 import { createElement } from '../render.js';
-import { humanizeEventDate, humanizeEventDay, humanizeEventTime } from '../model/events-model.js';
+// import { humanizeEventDate, humanizeEventDay, humanizeEventTime } from '../model/events-model.js';
+
 
 function createOffersTemplate(offers){
   return (
@@ -59,6 +60,7 @@ function createEventTemplate(event, destination, offers){
 
 export default class EventView {
   constructor(event, destinations, offersData){
+
     this.event = event;
     this.destination = destinations.find((item) => item.id === this.event.destination);
     const offersFinded = offersData.find((offers) => offers.type === this.event.type);
