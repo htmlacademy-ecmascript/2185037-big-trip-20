@@ -1,9 +1,3 @@
-import { getDataFromServer } from './utils.js';
-
-const PATH = '/big-trip/destinations';
-
-const getOffersFromServer = () => getDataFromServer(PATH);
-
 const Offers = [
   {
     'type': 'taxi',

@@ -1,9 +1,3 @@
-import { getDataFromServer } from './utils.js';
-
-const PATH = '/big-trip/destinations';
-
-const getDestinationsFromServer = () => getDataFromServer(PATH);
-
 const Destinations = [
   {
     'id': 'c2fc3868-4829-4ae9-afe5-eca4c1c26b7c',
