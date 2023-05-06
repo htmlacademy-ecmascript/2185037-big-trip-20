@@ -1,6 +1,12 @@
 import { createElement } from '../render.js';
-// import { humanizeEventDate, humanizeEventDay, humanizeEventTime } from '../model/events-model.js';
-
+import {
+  humanizeEventDateForm,
+  humanizeEventDateShedule,
+  humanizeEventDate,
+  humanizeEventDay,
+  humanizeEventTime
+} from '../utils.js';
+import dayjs from 'dayjs';
 
 function createOffersTemplate(offers){
   return (
@@ -18,6 +24,8 @@ function createOffersTemplate(offers){
 
 function createEventTemplate(event, destination, offers){
   const {basePrice, dateFrom, dateTo, isFavorite, type} = event;
+  const asdf = dayjs(dateTo).subtract(dayjs(dateFrom));
+  console.log(dayjs(asdf).format('DD HH m'));
 
   const favoriteClassName = isFavorite ? 'event__favorite-btn--active' : '';
 
@@ -26,16 +34,16 @@ function createEventTemplate(event, destination, offers){
   return (
     `<li class="trip-events__item">
       <div class="event">
-        <time class="event__date" datetime="2019-03-18">${'MAR 18'}</time>
+        <time class="event__date" datetime="${humanizeEventDate(dateFrom)}">${humanizeEventDay(dateFrom)}</time>
         <div class="event__type">
           <img class="event__type-icon" width="42" height="42" src="img/icons/${type.toLowerCase()}.png" alt="Event type icon">
         </div>
         <h3 class="event__title">${type} ${destination.name}</h3>
         <div class="event__schedule">
           <p class="event__time">
-            <time class="event__start-time" datetime="2019-03-18T10:30">10:30</time>
+            <time class="event__start-time" datetime="${humanizeEventDateShedule(dateFrom)}">${humanizeEventTime(dateFrom)}</time>
             &mdash;
-            <time class="event__end-time" datetime="2019-03-18T11:00">11:00</time>
+            <time class="event__end-time" datetime="${humanizeEventDateShedule(dateTo)}">${humanizeEventTime(dateTo)}</time>
           </p>
           <p class="event__duration">30M</p>
         </div>

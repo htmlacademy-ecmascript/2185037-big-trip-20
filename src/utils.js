@@ -1,7 +1,9 @@
 import dayjs from 'dayjs';
 import duration from 'dayjs/plugin/duration';
 
-const DATE_FORMAT = 'DD/MM/YY HH:mm';
+const DATE_FORMAT = 'YYYY-MM-DD';
+const DATE_FORMAT_FORM = 'DD/MM/YY HH:mm';
+const DATE_FORMAT_SCHEDULE = 'DD/MM/YYTHH:mm';
 const DAY_FORMAT = 'MMM D';
 const TIME_FORMAT = 'HH:mm';
 
@@ -11,6 +13,14 @@ function getRandomArrayElement(items) {
 
 function humanizeEventDate(date) {
   return date ? dayjs(date).format(DATE_FORMAT) : '';
+}
+
+function humanizeEventDateShedule(date) {
+  return date ? dayjs(date).format(DATE_FORMAT_SCHEDULE) : '';
+}
+
+function humanizeEventDateForm(date) {
+  return date ? dayjs(date).format(DATE_FORMAT_FORM) : '';
 }
 
 function humanizeEventDay(day) {
@@ -23,6 +33,8 @@ function humanizeEventTime(time) {
 
 export {
   getRandomArrayElement,
+  humanizeEventDateShedule,
+  humanizeEventDateForm,
   humanizeEventDate,
   humanizeEventDay,
   humanizeEventTime
