@@ -1,12 +1,12 @@
-import { getEventsFromServer } from '../mock/event.js';
-import { getDestinationsFromServer } from '../mock/destination.js';
-import { getOffersFromServer } from '../mock/offer.js';
+import { Events } from '../mock/event.js';
+import { Destinations } from '../mock/destination.js';
+import { Offers } from '../mock/offer.js';
 
 export default class MockService {
   constructor() {
-    this.events = getEventsFromServer();
-    this.destinations = getDestinationsFromServer();
-    this.offers = getOffersFromServer();
+    this.events = Events;
+    this.destinations = Destinations;
+    this.offers = Offers;
   }
 
   getEvents(){

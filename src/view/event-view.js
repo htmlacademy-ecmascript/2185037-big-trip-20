@@ -59,15 +59,13 @@ function createEventTemplate(event, destination, offers){
 }
 
 export default class EventView {
-  constructor(event, destinations, offersData){
-
+  constructor({event, destination, offer}){
     this.event = event;
-    this.destination = destinations.find((item) => item.id === this.event.destination);
-    const offersFinded = offersData.find((offers) => offers.type === this.event.type);
-    this.offers = offersFinded.offers.filter((offer) => this.event.offers.find((element) => offer.id === element));
+    this.destination = destination;
+    this.offer = offer;
   }
 
-  getTemplate(){
+  async getTemplate(){
     return createEventTemplate(this.event, this.destination, this.offers);
   }
 

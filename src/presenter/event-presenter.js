@@ -1,6 +1,5 @@
 import EventView from '../view/event-view.js';
 import EventListView from '../view/event-list-view.js';
-import EventNewView from '../view/event-new-view.js';
 import EventEditView from '../view/event-edit-view.js';
 import SortView from '../view/sort-view.js';
 import { render } from '../render.js';
@@ -26,16 +25,13 @@ export default class EventPresenter {
   init(){
     render(new SortView(), this.eventContainer);
     render(this.eventListComponent, this.eventContainer);
-
-    render(new EventEditView(this.events[0]), this.eventListComponent.getElement());
+    // render(new EventEditView(events[0]), this.eventListComponent.getElement());
 
     this.events.forEach((item) => {
-      console.log(item);
-
       render(new EventView({
         event: item,
         destination: this.destinationsModel.getById(item.destination),
-        offer: this.offers
+        offer: this.offersModel
       }), this.eventListComponent.getElement());
     });
   }
