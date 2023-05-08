@@ -1,21 +1,20 @@
 import { createElement } from '../render.js';
 import {
-  humanizeEventDateForm,
   humanizeEventDateShedule,
   humanizeEventDate,
   humanizeEventDay,
-  humanizeEventTime
+  humanizeEventTime,
+  humanizeEventDurationTime
 } from '../utils.js';
-import dayjs from 'dayjs';
 
 function createOffersTemplate(offers){
   return (
     `<ul class="event__selected-offers">
-      ${ offers[0] === undefined ? '' : offers.map((offer) => (
+      ${ offers[0] === undefined ? '' : offers.map(({title, price}) => (
       `<li class="event__offer">
-        <span class="event__offer-title">${offer.title}</span>
+        <span class="event__offer-title">${title}</span>
         &plus;&euro;&nbsp;
-        <span class="event__offer-price">${offer.price}</span>
+        <span class="event__offer-price">${price}</span>
       </li>`
     )).join('')}
     </ul>`
@@ -24,11 +23,8 @@ function createOffersTemplate(offers){
 
 function createEventTemplate(event, destination, offers){
   const {basePrice, dateFrom, dateTo, isFavorite, type} = event;
-  const asdf = dayjs(dateTo).subtract(dayjs(dateFrom));
-  console.log(dayjs(asdf).format('DD HH m'));
 
   const favoriteClassName = isFavorite ? 'event__favorite-btn--active' : '';
-
   const offersTemplate = createOffersTemplate(offers);
 
   return (
@@ -45,7 +41,7 @@ function createEventTemplate(event, destination, offers){
             &mdash;
             <time class="event__end-time" datetime="${humanizeEventDateShedule(dateTo)}">${humanizeEventTime(dateTo)}</time>
           </p>
-          <p class="event__duration">30M</p>
+          <p class="event__duration">${humanizeEventDurationTime(dateFrom,dateTo)}</p>
         </div>
         <p class="event__price">
           &euro;&nbsp;<span class="event__price-value">${basePrice}</span>
@@ -70,7 +66,7 @@ export default class EventView {
   constructor({event, destination, offers}){
     this.event = event;
     this.destination = destination;
-    this.offers = [offers];
+    this.offers = offers;
   }
 
   getTemplate(){
