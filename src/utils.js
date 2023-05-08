@@ -1,11 +1,17 @@
 import dayjs from 'dayjs';
-import duration from 'dayjs/plugin/duration';
+import utc from 'dayjs/plugin/utc.js';
+import duration from 'dayjs/plugin/duration.js';
+dayjs.extend(utc);
+dayjs.extend(duration);
 
 const DATE_FORMAT = 'YYYY-MM-DD';
 const DATE_FORMAT_FORM = 'DD/MM/YY HH:mm';
 const DATE_FORMAT_SCHEDULE = 'DD/MM/YYTHH:mm';
 const DAY_FORMAT = 'MMM D';
 const TIME_FORMAT = 'HH:mm';
+const DAY_DURATION_FORMAT = 'D[D] HH[H] m[M]';
+const HOUR_DURATION_FORMAT = 'HH[H] m[M]';
+const MINUTE_DURATION_FORMAT = 'm[M]';
 
 function getRandomArrayElement(items) {
   return items[Math.floor(Math.random() * items.length)];
@@ -31,11 +37,26 @@ function humanizeEventTime(time) {
   return time ? dayjs(time).format(TIME_FORMAT) : '';
 }
 
+function humanizeEventDurationTime(dateFrom, dateTo){
+  const timeDiffMs = dayjs(dateTo).diff(dateFrom);
+
+  if(dayjs.duration(timeDiffMs).asDays() > 1){
+    return dayjs(timeDiffMs).utc().format(DAY_DURATION_FORMAT);
+  }
+
+  if(dayjs.duration(timeDiffMs).asMinutes() > 59){
+    return dayjs(timeDiffMs).utc().format(HOUR_DURATION_FORMAT);
+  }
+
+  return dayjs(timeDiffMs).utc().format(MINUTE_DURATION_FORMAT);
+}
+
 export {
   getRandomArrayElement,
   humanizeEventDateShedule,
   humanizeEventDateForm,
   humanizeEventDate,
   humanizeEventDay,
-  humanizeEventTime
+  humanizeEventTime,
+  humanizeEventDurationTime
 };
