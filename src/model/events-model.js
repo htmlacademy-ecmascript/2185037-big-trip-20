@@ -1,7 +1,7 @@
 export default class EventModel {
   constructor(service){
     this.service = service;
-    this.events = this.service.getEvents();
+    this.events = this.service.events;
   }
 
   get(){

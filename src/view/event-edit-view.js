@@ -64,7 +64,7 @@ function createOffersList(event, offers){
 function createPhotosList(pictures){
   return (
     `<div class="event__photos-tape">
-      ${pictures.map(({src, description}) => `<img class="${src}" alt="${description}">`).join('')}
+      ${pictures.map(({src, description}) => `<img class="event__photo" src="${src}" alt="${description}">`).join('')}
     </div>`
   );
 }

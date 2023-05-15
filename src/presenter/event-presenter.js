@@ -5,7 +5,12 @@ import EventEditView from '../view/event-edit-view.js';
 import SortView from '../view/sort-view.js';
 
 export default class EventPresenter {
-  eventListComponent = new EventListView();
+  #eventListComponent = new EventListView();
+  #eventContainer = null;
+  #destinationsModel = null;
+  #offersModel = null;
+  #eventsModel = null;
+  #events = null;
 
   constructor({
     eventContainer,
@@ -13,31 +18,31 @@ export default class EventPresenter {
     offersModel,
     eventsModel
   }){
-    this.eventContainer = eventContainer;
+    this.#eventContainer = eventContainer;
 
-    this.destinationsModel = destinationsModel;
-    this.offersModel = offersModel;
-    this.eventsModel = eventsModel;
+    this.#destinationsModel = destinationsModel;
+    this.#offersModel = offersModel;
+    this.#eventsModel = eventsModel;
 
-    this.events = eventsModel.get();
+    this.#events = eventsModel.get();
   }
 
   init(){
-    render(new SortView(), this.eventContainer);
-    render(this.eventListComponent, this.eventContainer);
+    render(new SortView(), this.#eventContainer);
+    render(this.#eventListComponent, this.#eventContainer);
     render(new EventEditView({
-      event: this.events[0],
-      destinations: this.destinationsModel.get(),
-      offers: this.offersModel.get()
-    }), this.eventListComponent.element());
+      event: this.#events[0],
+      destinations: this.#destinationsModel.get(),
+      offers: this.#offersModel.get()
+    }), this.#eventListComponent.element);
 
-    this.events.forEach((item) => {
-      const offersByType = this.offersModel.getByType(item.type);
+    this.#events.forEach((item) => {
+      const offersByType = this.#offersModel.getByType(item.type);
       render(new EventView({
         event: item,
-        destination: this.destinationsModel.getById(item.destination),
-        offers: this.offersModel.getByIds(offersByType, item.offers)
-      }), this.eventListComponent.element());
+        destination: this.#destinationsModel.getById(item.destination),
+        offers: this.#offersModel.getByIds(offersByType, item.offers)
+      }), this.#eventListComponent.element);
     });
   }
 }

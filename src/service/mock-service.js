@@ -3,21 +3,25 @@ import { Destinations } from '../mock/destination.js';
 import { Offers } from '../mock/offer.js';
 
 export default class MockService {
+  #events = null;
+  #destinations = null;
+  #offers = null;
+
   constructor() {
-    this.events = Events;
-    this.destinations = Destinations;
-    this.offers = Offers;
+    this.#events = Events;
+    this.#destinations = Destinations;
+    this.#offers = Offers;
   }
 
-  getEvents(){
-    return this.events;
+  get events(){
+    return this.#events;
   }
 
-  getDestinations(){
-    return this.destinations;
+  get destinations(){
+    return this.#destinations;
   }
 
-  getOffers(){
-    return this.offers;
+  get offers(){
+    return this.#offers;
   }
 }
