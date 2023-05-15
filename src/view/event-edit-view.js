@@ -1,4 +1,4 @@
-import { createElement } from '../render.js';
+import AbstractView from '../framework/view/abstract-view.js';
 import { TYPES_EVENT } from '../const.js';
 import { humanizeEventDateForm } from '../utils.js';
 
@@ -128,26 +128,19 @@ function createEventEditTemplate(event, destinations, offers){
   );
 }
 
-export default class EventEditView {
+export default class EventEditView extends AbstractView {
+  #event = null;
+  #destinations = null;
+  #offers = null;
+
   constructor({event, destinations, offers}){
-    this.event = event;
-    this.destinations = destinations;
-    this.offers = offers;
+    super();
+    this.#event = event;
+    this.#destinations = destinations;
+    this.#offers = offers;
   }
 
-  getTemplate(){
-    return createEventEditTemplate(this.event, this.destinations, this.offers);
-  }
-
-  getElement(){
-    if(!this.element){
-      this.element = createElement(this.getTemplate());
-    }
-
-    return this.element;
-  }
-
-  removeElement(){
-    this.element = null;
+  get template(){
+    return createEventEditTemplate(this.#event, this.#destinations, this.#offers);
   }
 }

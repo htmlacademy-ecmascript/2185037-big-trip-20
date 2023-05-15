@@ -1,8 +1,8 @@
+import { render } from '../framework/render.js';
 import EventView from '../view/event-view.js';
 import EventListView from '../view/event-list-view.js';
 import EventEditView from '../view/event-edit-view.js';
 import SortView from '../view/sort-view.js';
-import { render } from '../render.js';
 
 export default class EventPresenter {
   eventListComponent = new EventListView();
@@ -29,7 +29,7 @@ export default class EventPresenter {
       event: this.events[0],
       destinations: this.destinationsModel.get(),
       offers: this.offersModel.get()
-    }), this.eventListComponent.getElement());
+    }), this.eventListComponent.element());
 
     this.events.forEach((item) => {
       const offersByType = this.offersModel.getByType(item.type);
@@ -37,7 +37,7 @@ export default class EventPresenter {
         event: item,
         destination: this.destinationsModel.getById(item.destination),
         offers: this.offersModel.getByIds(offersByType, item.offers)
-      }), this.eventListComponent.getElement());
+      }), this.eventListComponent.element());
     });
   }
 }

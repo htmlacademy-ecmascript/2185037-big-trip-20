@@ -1,6 +1,6 @@
+import { render } from './framework/render.js';
 import FilterView from './view/filter-view.js';
 import EventPresenter from './presenter/event-presenter.js';
-import { render } from './render.js';
 
 import EventModel from './model/events-model.js';
 import DestinationModel from './model/destinations-model.js';
