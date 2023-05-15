@@ -37,12 +37,18 @@ export default class EventPresenter {
     }), this.#eventListComponent.element);
 
     this.#events.forEach((item) => {
-      const offersByType = this.#offersModel.getByType(item.type);
-      render(new EventView({
-        event: item,
-        destination: this.#destinationsModel.getById(item.destination),
-        offers: this.#offersModel.getByIds(offersByType, item.offers)
-      }), this.#eventListComponent.element);
+      this.#renderEvent(item);
     });
+  }
+
+  #renderEvent(item){
+    const offersByType = this.#offersModel.getByType(item.type);
+    const eventComponent = new EventView({
+      event: item,
+      destination: this.#destinationsModel.getById(item.destination),
+      offers: this.#offersModel.getByIds(offersByType, item.offers)
+    });
+
+    render(eventComponent, this.#eventListComponent.element);
   }
 }
