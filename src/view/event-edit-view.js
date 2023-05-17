@@ -1,6 +1,6 @@
 import AbstractView from '../framework/view/abstract-view.js';
 import { TYPES_EVENT } from '../const.js';
-import { humanizeEventDateForm } from '../utils.js';
+import { humanizeEventDateForm } from '../utils/event.js';
 
 function createTypeList(typeEvent){
   return (

@@ -1,6 +1,6 @@
 import { render } from './framework/render.js';
-import FilterView from './view/filter-view.js';
 import EventPresenter from './presenter/event-presenter.js';
+import FilterPresenter from './presenter/filter-presenter.js';
 
 import EventModel from './model/events-model.js';
 import DestinationModel from './model/destinations-model.js';
@@ -18,6 +18,11 @@ const destinationsModel = new DestinationModel(mockService);
 const offersModel = new OfferModel(mockService);
 const eventsModel = new EventModel(mockService);
 
+const filterPresenter = new FilterPresenter({
+  filterContainer: siteFiltersElement,
+  eventsModel
+});
+
 const eventPresenter = new EventPresenter({
   eventContainer: siteEventsElement,
   destinationsModel,
@@ -25,7 +30,5 @@ const eventPresenter = new EventPresenter({
   eventsModel
 });
 
-
-render(new FilterView(), siteFiltersElement);
-
+filterPresenter.init();
 eventPresenter.init();
