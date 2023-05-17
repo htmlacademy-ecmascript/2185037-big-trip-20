@@ -1,4 +1,4 @@
-import { render } from '../framework/render.js';
+import { render, replace, remove } from '../framework/render.js';
 import EventView from '../view/event-view.js';
 import EventListView from '../view/event-list-view.js';
 import EventEditView from '../view/event-edit-view.js';
@@ -24,17 +24,12 @@ export default class EventPresenter {
     this.#offersModel = offersModel;
     this.#eventsModel = eventsModel;
 
-    this.#events = eventsModel.get();
+    this.#events = eventsModel.events;
   }
 
   init(){
     render(new SortView(), this.#eventContainer);
     render(this.#eventListComponent, this.#eventContainer);
-    render(new EventEditView({
-      event: this.#events[0],
-      destinations: this.#destinationsModel.get(),
-      offers: this.#offersModel.get()
-    }), this.#eventListComponent.element);
 
     this.#events.forEach((item) => {
       this.#renderEvent(item);
@@ -43,11 +38,42 @@ export default class EventPresenter {
 
   #renderEvent(item){
     const offersByType = this.#offersModel.getByType(item.type);
+
+    const escKeyDownHandler = (evt) => {
+      if (evt.key === 'Escape') {
+        evt.preventDefault();
+        replaceFormToEvent();
+        document.removeEventListener('keydown', escKeyDownHandler);
+      }
+    };
+
     const eventComponent = new EventView({
       event: item,
       destination: this.#destinationsModel.getById(item.destination),
-      offers: this.#offersModel.getByIds(offersByType, item.offers)
+      offers: this.#offersModel.getByIds(offersByType, item.offers),
+      onEditClick: () => {
+        replaceEventToForm();
+        document.addEventListener('keydown', escKeyDownHandler);
+      }
     });
+
+    const eventEditComponent = new EventEditView({
+      event: item,
+      destinations: this.#destinationsModel.destinations,
+      offers: this.#offersModel.offers,
+      onFormSubmit: () => {
+        replaceFormToEvent();
+        document.removeEventListener('keydown', escKeyDownHandler);
+      }
+    });
+
+    function replaceEventToForm() {
+      replace(eventEditComponent, eventComponent);
+    }
+
+    function replaceFormToEvent() {
+      replace(eventComponent, eventEditComponent);
+    }
 
     render(eventComponent, this.#eventListComponent.element);
   }
