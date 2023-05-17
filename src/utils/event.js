@@ -52,15 +52,15 @@ function humanizeEventDurationTime(dateFrom, dateTo){
 }
 
 function isEventFuture(event){
-  return dayjs(event).isBefore(event.dateFrom);
+  return dayjs().isBefore(event.dateFrom);
 }
 
 function isEventPast(event){
-  return dayjs(event).isAfter(event.dateTo);
+  return dayjs().isAfter(event.dateTo);
 }
 
 function isEventPresent(event){
-  return (dayjs(event).isAfter(event.dateFrom) && dayjs(event).isBefore(event.dateTo));
+  return (dayjs().isAfter(event.dateFrom) && dayjs(event).isBefore(event.dateTo));
 }
 
 export {
