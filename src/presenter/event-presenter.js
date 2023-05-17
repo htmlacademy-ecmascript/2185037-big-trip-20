@@ -3,6 +3,8 @@ import EventView from '../view/event-view.js';
 import EventListView from '../view/event-list-view.js';
 import EventEditView from '../view/event-edit-view.js';
 import SortView from '../view/sort-view.js';
+import EventEmptyView from '../view/event-list-empty-view.js';
+
 
 export default class EventPresenter {
   #eventListComponent = new EventListView();
@@ -77,9 +79,20 @@ export default class EventPresenter {
     render(eventComponent, this.#eventListComponent.element);
   }
 
+  #renderEventEmpty(){
+    const eventEmptyComponent = new EventEmptyView();
+
+    render(eventEmptyComponent, this.#eventListComponent.element);
+  }
+
   #renderListEvents(){
     render(new SortView(), this.#eventContainer);
     render(this.#eventListComponent, this.#eventContainer);
+
+    if(this.#eventsModel.hasEvents()){
+      this.#renderEventEmpty();
+      return;
+    }
 
     this.#events.forEach((item) => {
       this.#renderEvent(item);
