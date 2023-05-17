@@ -9,4 +9,8 @@ export default class EventModel {
   get events(){
     return this.#events;
   }
+
+  hasEvents(){
+    return this.#events.length <= 1;
+  }
 }
