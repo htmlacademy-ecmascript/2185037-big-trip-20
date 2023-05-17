@@ -23,17 +23,12 @@ export default class EventPresenter {
     this.#destinationsModel = destinationsModel;
     this.#offersModel = offersModel;
     this.#eventsModel = eventsModel;
-
-    this.#events = eventsModel.events;
   }
 
   init(){
-    render(new SortView(), this.#eventContainer);
-    render(this.#eventListComponent, this.#eventContainer);
+    this.#events = this.#eventsModel.events;
 
-    this.#events.forEach((item) => {
-      this.#renderEvent(item);
-    });
+    this.#renderListEvents();
   }
 
   #renderEvent(item){
@@ -76,5 +71,14 @@ export default class EventPresenter {
     }
 
     render(eventComponent, this.#eventListComponent.element);
+  }
+
+  #renderListEvents(){
+    render(new SortView(), this.#eventContainer);
+    render(this.#eventListComponent, this.#eventContainer);
+
+    this.#events.forEach((item) => {
+      this.#renderEvent(item);
+    });
   }
 }
