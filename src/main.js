@@ -1,4 +1,3 @@
-import { render } from './framework/render.js';
 import EventPresenter from './presenter/event-presenter.js';
 import FilterPresenter from './presenter/filter-presenter.js';
 
