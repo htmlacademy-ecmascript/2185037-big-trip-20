@@ -1,4 +1,4 @@
-import { createElement } from '../render.js';
+import AbstractView from '../framework/view/abstract-view.js';
 
 function createEventNewWithoutOffersTemplate(){
   return (
@@ -117,20 +117,19 @@ function createEventNewWithoutOffersTemplate(){
   );
 }
 
-export default class EventNewWithoutOffersView {
-  getTemplate(){
+export default class EventNewWithoutOffersView extends AbstractView {
+  #event = null;
+  #destinations = null;
+  #offers = null;
+
+  constructor({event, destinations, offers}){
+    super();
+    this.#event = event;
+    this.#destinations = destinations;
+    this.#offers = offers;
+  }
+
+  get template(){
     return createEventNewWithoutOffersTemplate();
-  }
-
-  getElement(){
-    if(!this.element){
-      this.element = createElement(this.getTemplate());
-    }
-
-    return this.element;
-  }
-
-  removeElement(){
-    this.element = null;
   }
 }

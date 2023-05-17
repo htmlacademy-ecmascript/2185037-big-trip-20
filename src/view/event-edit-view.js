@@ -1,4 +1,4 @@
-import { createElement } from '../render.js';
+import AbstractView from '../framework/view/abstract-view.js';
 import { TYPES_EVENT } from '../const.js';
 import { humanizeEventDateForm } from '../utils.js';
 
@@ -64,7 +64,7 @@ function createOffersList(event, offers){
 function createPhotosList(pictures){
   return (
     `<div class="event__photos-tape">
-      ${pictures.map(({src, description}) => `<img class="${src}" alt="${description}">`).join('')}
+      ${pictures.map(({src, description}) => `<img class="event__photo" src="${src}" alt="${description}">`).join('')}
     </div>`
   );
 }
@@ -128,26 +128,29 @@ function createEventEditTemplate(event, destinations, offers){
   );
 }
 
-export default class EventEditView {
-  constructor({event, destinations, offers}){
-    this.event = event;
-    this.destinations = destinations;
-    this.offers = offers;
+export default class EventEditView extends AbstractView {
+  #event = null;
+  #destinations = null;
+  #offers = null;
+  #handleFormSubmit = null;
+
+  constructor({event, destinations, offers, onFormSubmit}){
+    super();
+    this.#event = event;
+    this.#destinations = destinations;
+    this.#offers = offers;
+    this.#handleFormSubmit = onFormSubmit;
+
+    this.element.querySelector('form').addEventListener('submit', this.#formSubmitHandler);
+    this.element.querySelector('.event__rollup-btn').addEventListener('click', this.#formSubmitHandler);
   }
 
-  getTemplate(){
-    return createEventEditTemplate(this.event, this.destinations, this.offers);
+  get template(){
+    return createEventEditTemplate(this.#event, this.#destinations, this.#offers);
   }
 
-  getElement(){
-    if(!this.element){
-      this.element = createElement(this.getTemplate());
-    }
-
-    return this.element;
-  }
-
-  removeElement(){
-    this.element = null;
-  }
+  #formSubmitHandler = (evt) => {
+    evt.preventDefault();
+    this.#handleFormSubmit();
+  };
 }

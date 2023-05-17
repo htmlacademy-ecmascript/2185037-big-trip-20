@@ -1,4 +1,4 @@
-import { createElement } from '../render.js';
+import AbstractView from '../framework/view/abstract-view.js';
 import {
   humanizeEventDateShedule,
   humanizeEventDate,
@@ -62,26 +62,28 @@ function createEventTemplate(event, destination, offers){
   );
 }
 
-export default class EventView {
-  constructor({event, destination, offers}){
-    this.event = event;
-    this.destination = destination;
-    this.offers = offers;
+export default class EventView extends AbstractView{
+  #event = null;
+  #destination = null;
+  #offers = null;
+  #handleEditClick = null;
+
+  constructor({event, destination, offers, onEditClick}){
+    super();
+    this.#event = event;
+    this.#destination = destination;
+    this.#offers = offers;
+    this.#handleEditClick = onEditClick;
+
+    this.element.querySelector('.event__rollup-btn').addEventListener('click', this.#editClickHandler);
   }
 
-  getTemplate(){
-    return createEventTemplate(this.event, this.destination, this.offers);
+  get template(){
+    return createEventTemplate(this.#event, this.#destination, this.#offers);
   }
 
-  getElement(){
-    if(!this.element){
-      this.element = createElement(this.getTemplate());
-    }
-
-    return this.element;
-  }
-
-  removeElement(){
-    this.element = null;
-  }
+  #editClickHandler = (evt) => {
+    evt.preventDefault();
+    this.#handleEditClick();
+  };
 }

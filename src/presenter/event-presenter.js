@@ -1,11 +1,16 @@
+import { render, replace } from '../framework/render.js';
 import EventView from '../view/event-view.js';
 import EventListView from '../view/event-list-view.js';
 import EventEditView from '../view/event-edit-view.js';
 import SortView from '../view/sort-view.js';
-import { render } from '../render.js';
 
 export default class EventPresenter {
-  eventListComponent = new EventListView();
+  #eventListComponent = new EventListView();
+  #eventContainer = null;
+  #destinationsModel = null;
+  #offersModel = null;
+  #eventsModel = null;
+  #events = null;
 
   constructor({
     eventContainer,
@@ -13,31 +18,67 @@ export default class EventPresenter {
     offersModel,
     eventsModel
   }){
-    this.eventContainer = eventContainer;
+    this.#eventContainer = eventContainer;
 
-    this.destinationsModel = destinationsModel;
-    this.offersModel = offersModel;
-    this.eventsModel = eventsModel;
-
-    this.events = eventsModel.get();
+    this.#destinationsModel = destinationsModel;
+    this.#offersModel = offersModel;
+    this.#eventsModel = eventsModel;
   }
 
   init(){
-    render(new SortView(), this.eventContainer);
-    render(this.eventListComponent, this.eventContainer);
-    render(new EventEditView({
-      event: this.events[0],
-      destinations: this.destinationsModel.get(),
-      offers: this.offersModel.get()
-    }), this.eventListComponent.getElement());
+    this.#events = this.#eventsModel.events;
 
-    this.events.forEach((item) => {
-      const offersByType = this.offersModel.getByType(item.type);
-      render(new EventView({
-        event: item,
-        destination: this.destinationsModel.getById(item.destination),
-        offers: this.offersModel.getByIds(offersByType, item.offers)
-      }), this.eventListComponent.getElement());
+    this.#renderListEvents();
+  }
+
+  #renderEvent(item){
+    const offersByType = this.#offersModel.getByType(item.type);
+
+    const escKeyDownHandler = (evt) => {
+      if (evt.key === 'Escape') {
+        evt.preventDefault();
+        replaceFormToEvent();
+        document.removeEventListener('keydown', escKeyDownHandler);
+      }
+    };
+
+    const eventComponent = new EventView({
+      event: item,
+      destination: this.#destinationsModel.getById(item.destination),
+      offers: this.#offersModel.getByIds(offersByType, item.offers),
+      onEditClick: () => {
+        replaceEventToForm();
+        document.addEventListener('keydown', escKeyDownHandler);
+      }
+    });
+
+    const eventEditComponent = new EventEditView({
+      event: item,
+      destinations: this.#destinationsModel.destinations,
+      offers: this.#offersModel.offers,
+      onFormSubmit: () => {
+        replaceFormToEvent();
+        document.removeEventListener('keydown', escKeyDownHandler);
+      }
+    });
+
+    function replaceEventToForm() {
+      replace(eventEditComponent, eventComponent);
+    }
+
+    function replaceFormToEvent() {
+      replace(eventComponent, eventEditComponent);
+    }
+
+    render(eventComponent, this.#eventListComponent.element);
+  }
+
+  #renderListEvents(){
+    render(new SortView(), this.#eventContainer);
+    render(this.#eventListComponent, this.#eventContainer);
+
+    this.#events.forEach((item) => {
+      this.#renderEvent(item);
     });
   }
 }
