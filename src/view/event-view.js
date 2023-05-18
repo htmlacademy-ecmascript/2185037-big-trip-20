@@ -5,7 +5,7 @@ import {
   humanizeEventDay,
   humanizeEventTime,
   humanizeEventDurationTime
-} from '../utils.js';
+} from '../utils/event.js';
 
 function createOffersTemplate(offers){
   return (

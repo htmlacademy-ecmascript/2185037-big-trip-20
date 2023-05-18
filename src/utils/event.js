@@ -51,6 +51,18 @@ function humanizeEventDurationTime(dateFrom, dateTo){
   return dayjs(timeDiffMs).utc().format(MINUTE_DURATION_FORMAT);
 }
 
+function isEventFuture(event){
+  return dayjs().isBefore(event.dateFrom);
+}
+
+function isEventPast(event){
+  return dayjs().isAfter(event.dateTo);
+}
+
+function isEventPresent(event){
+  return (dayjs().isAfter(event.dateFrom) && dayjs(event).isBefore(event.dateTo));
+}
+
 export {
   getRandomArrayElement,
   humanizeEventDateShedule,
@@ -58,5 +70,8 @@ export {
   humanizeEventDate,
   humanizeEventDay,
   humanizeEventTime,
-  humanizeEventDurationTime
+  humanizeEventDurationTime,
+  isEventFuture,
+  isEventPast,
+  isEventPresent
 };
