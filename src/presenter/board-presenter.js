@@ -1,18 +1,21 @@
-import { render, replace } from '../framework/render.js';
+import { render, replace, RenderPosition } from '../framework/render.js';
 import EventView from '../view/event-view.js';
-import EventListView from '../view/event-list-view.js';
+import BoardView from '../view/event-list-view.js';
 import EventEditView from '../view/event-edit-view.js';
 import SortView from '../view/sort-view.js';
 import EventEmptyView from '../view/event-list-empty-view.js';
 
 
-export default class EventPresenter {
-  #eventListComponent = new EventListView();
+export default class BoardPresenter {
+  #boardComponent = new BoardView();
+  #sortComponent = new SortView();
+  #eventEmptyComponent = new EventEmptyView();
   #eventContainer = null;
   #destinationsModel = null;
   #offersModel = null;
   #eventsModel = null;
-  #events = null;
+
+  #events = [];
 
   constructor({
     eventContainer,
@@ -30,7 +33,11 @@ export default class EventPresenter {
   init(){
     this.#events = this.#eventsModel.events;
 
-    this.#renderListEvents();
+    this.#renderBoard();
+  }
+
+  #renderSort() {
+    render(this.#sortComponent, this.#boardComponent.element, RenderPosition.AFTERBEGIN);
   }
 
   #renderEvent(item){
@@ -76,18 +83,21 @@ export default class EventPresenter {
       document.removeEventListener('keydown', escKeyDownHandler);
     }
 
-    render(eventComponent, this.#eventListComponent.element);
+    render(eventComponent, this.#boardComponent.element);
   }
 
   #renderEventEmpty(){
-    const eventEmptyComponent = new EventEmptyView();
-
-    render(eventEmptyComponent, this.#eventListComponent.element);
+    render(this.#eventEmptyComponent, this.#boardComponent.element, RenderPosition.AFTERBEGIN);
   }
 
-  #renderListEvents(){
-    render(new SortView(), this.#eventContainer);
-    render(this.#eventListComponent, this.#eventContainer);
+  #renderEvents(from, to){
+    this.#events
+      .slice((from, to))
+      .forEach((event) => this.#renderEvent(event));
+  }
+
+  #renderBoard(){
+    render(this.#boardComponent, this.#eventContainer);
 
     if(this.#eventsModel.hasEvents()){
       this.#renderEventEmpty();

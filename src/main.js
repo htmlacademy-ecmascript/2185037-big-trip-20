@@ -1,4 +1,4 @@
-import EventPresenter from './presenter/event-presenter.js';
+import BoardPresenter from './presenter/board-presenter.js';
 import FilterPresenter from './presenter/filter-presenter.js';
 
 import EventModel from './model/events-model.js';
@@ -22,7 +22,7 @@ const filterPresenter = new FilterPresenter({
   eventsModel
 });
 
-const eventPresenter = new EventPresenter({
+const eventPresenter = new BoardPresenter({
   eventContainer: siteEventsElement,
   destinationsModel,
   offersModel,
