@@ -1,16 +1,17 @@
 import { render, replace, RenderPosition } from '../framework/render.js';
 import EventView from '../view/event-view.js';
-import BoardView from '../view/event-list-view.js';
+import EventListView from '../view/event-list-view.js';
 import EventEditView from '../view/event-edit-view.js';
 import SortView from '../view/sort-view.js';
 import EventEmptyView from '../view/event-list-empty-view.js';
 
 
 export default class BoardPresenter {
-  #boardComponent = new BoardView();
+  #eventListComponent = new EventListView();
   #sortComponent = new SortView();
   #eventEmptyComponent = new EventEmptyView();
-  #eventContainer = null;
+
+  #container = null;
   #destinationsModel = null;
   #offersModel = null;
   #eventsModel = null;
@@ -18,12 +19,12 @@ export default class BoardPresenter {
   #events = [];
 
   constructor({
-    eventContainer,
+    container,
     destinationsModel,
     offersModel,
     eventsModel
   }){
-    this.#eventContainer = eventContainer;
+    this.#container = container;
 
     this.#destinationsModel = destinationsModel;
     this.#offersModel = offersModel;
@@ -34,10 +35,6 @@ export default class BoardPresenter {
     this.#events = this.#eventsModel.events;
 
     this.#renderBoard();
-  }
-
-  #renderSort() {
-    render(this.#sortComponent, this.#boardComponent.element, RenderPosition.AFTERBEGIN);
   }
 
   #renderEvent(item){
@@ -83,29 +80,35 @@ export default class BoardPresenter {
       document.removeEventListener('keydown', escKeyDownHandler);
     }
 
-    render(eventComponent, this.#boardComponent.element);
+    render(eventComponent, this.#eventListComponent.element);
+  }
+
+  #renderSort() {
+    render(this.#sortComponent, this.#container, RenderPosition.BEFOREEND);
   }
 
   #renderEventEmpty(){
-    render(this.#eventEmptyComponent, this.#boardComponent.element, RenderPosition.AFTERBEGIN);
+    render(this.#eventEmptyComponent, this.#container, RenderPosition.BEFOREEND);
   }
 
-  #renderEvents(from, to){
-    this.#events
-      .slice((from, to))
-      .forEach((event) => this.#renderEvent(event));
+  #renderEvents(){
+    this.#events.forEach((event) => this.#renderEvent(event));
+  }
+
+  #renderEventList(){
+    render(this.#eventListComponent, this.#container);
+
+    this.#renderEvents();
   }
 
   #renderBoard(){
-    render(this.#boardComponent, this.#eventContainer);
 
     if(this.#eventsModel.hasEvents()){
       this.#renderEventEmpty();
       return;
     }
 
-    this.#events.forEach((item) => {
-      this.#renderEvent(item);
-    });
+    this.#renderSort();
+    this.#renderEventList();
   }
 }

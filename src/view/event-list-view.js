@@ -1,11 +1,11 @@
 import AbstractView from '../framework/view/abstract-view.js';
 
-function createBoardViewTemplate(){
+function createEventListTemplate(){
   return '<ul class="trip-events__list"></ul>';
 }
 
-export default class BoardView extends AbstractView {
+export default class EventListView extends AbstractView {
   get template(){
-    return createBoardViewTemplate();
+    return createEventListTemplate();
   }
 }
