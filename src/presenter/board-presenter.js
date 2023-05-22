@@ -1,9 +1,8 @@
-import { render, replace, RenderPosition } from '../framework/render.js';
-import EventView from '../view/event-view.js';
+import { render, RenderPosition } from '../framework/render.js';
 import EventListView from '../view/event-list-view.js';
-import EventEditView from '../view/event-edit-view.js';
 import SortView from '../view/sort-view.js';
 import EventEmptyView from '../view/event-list-empty-view.js';
+import EventPresenter from './event-presenter.js';
 
 
 export default class BoardPresenter {
@@ -37,50 +36,14 @@ export default class BoardPresenter {
     this.#renderBoard();
   }
 
-  #renderEvent(item){
-    const offersByType = this.#offersModel.getByType(item.type);
-
-    const eventComponent = new EventView({
-      event: item,
-      destination: this.#destinationsModel.getById(item.destination),
-      offers: this.#offersModel.getByIds(offersByType, item.offers),
-      onEditClick: eventEditClickHandler
+  #renderEvent(event){
+    const eventPresenter = new EventPresenter({
+      container: this.#eventListComponent.element,
+      destinationsModel: this.#destinationsModel,
+      offersModel: this.#offersModel,
     });
 
-    const eventEditComponent = new EventEditView({
-      event: item,
-      destinations: this.#destinationsModel.destinations,
-      offers: this.#offersModel.offers,
-      onFormSubmit: eventSubmitHandler
-    });
-
-    const replaceEventToForm = () => {
-      replace(eventEditComponent, eventComponent);
-    };
-
-    const replaceFormToEvent = () => {
-      replace(eventComponent, eventEditComponent);
-    };
-
-    const escKeyDownHandler = (evt) => {
-      if (evt.key === 'Escape') {
-        evt.preventDefault();
-        replaceFormToEvent();
-        document.removeEventListener('keydown', escKeyDownHandler);
-      }
-    };
-
-    function eventEditClickHandler() {
-      replaceEventToForm();
-      document.addEventListener('keydown', escKeyDownHandler);
-    }
-
-    function eventSubmitHandler() {
-      replaceFormToEvent();
-      document.removeEventListener('keydown', escKeyDownHandler);
-    }
-
-    render(eventComponent, this.#eventListComponent.element);
+    eventPresenter.init(event);
   }
 
   #renderSort() {
