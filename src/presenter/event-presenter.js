@@ -1,4 +1,4 @@
-import { render, replace } from '../framework/render.js';
+import { render, replace, remove } from '../framework/render.js';
 import EventView from '../view/event-view.js';
 import EventEditView from '../view/event-edit-view.js';
 
@@ -9,6 +9,8 @@ export default class EventPresenter {
 
   #eventComponent = null;
   #eventEditComponent = null;
+
+  #event = null;
 
   constructor({
     container,
@@ -21,48 +23,72 @@ export default class EventPresenter {
   }
 
   init(event){
+    this.#event = event;
+
+    const prevEventComponent = this.#eventComponent;
+    const prevEventEditComponent = this.#eventEditComponent;
+
     const offersByType = this.#offersModel.getByType(event.type);
 
     this.#eventComponent = new EventView({
-      event,
+      event: this.#event,
       destination: this.#destinationsModel.getById(event.destination),
       offers: this.#offersModel.getByIds(offersByType, event.offers),
-      onEditClick: eventEditClickHandler
+      onEditClick: this.#handleEditClick
     });
 
     this.#eventEditComponent = new EventEditView({
-      event,
+      event: this.#event,
       destinations: this.#destinationsModel.destinations,
       offers: this.#offersModel.offers,
-      onFormSubmit: eventSubmitHandler
+      onFormSubmit: this.#handleFormSubmit
     });
 
-    const replaceEventToForm = () => {
-      replace(this.#eventEditComponent, this.#eventComponent);
-    };
-
-    const replaceFormToEvent = () => {
-      replace(this.#eventComponent, this.#eventEditComponent);
-    };
-
-    const escKeyDownHandler = (evt) => {
-      if (evt.key === 'Escape') {
-        evt.preventDefault();
-        replaceFormToEvent();
-        document.removeEventListener('keydown', escKeyDownHandler);
-      }
-    };
-
-    function eventEditClickHandler() {
-      replaceEventToForm();
-      document.addEventListener('keydown', escKeyDownHandler);
+    if(prevEventComponent === null || prevEventEditComponent === null){
+      render(this.#eventComponent, this.#container);
+      return;
     }
 
-    function eventSubmitHandler() {
-      replaceFormToEvent();
-      document.removeEventListener('keydown', escKeyDownHandler);
+    if(this.#container.contains(prevEventComponent.element)){
+      replace(this.#eventComponent, prevEventComponent);
     }
 
-    render(this.#eventComponent, this.#container);
+    if(this.#container.contains(prevEventEditComponent.element)){
+      replace(this.#eventEditComponent, prevEventEditComponent);
+    }
+
+    remove(prevEventComponent);
+    remove(prevEventEditComponent);
   }
+
+  destroy(){
+    remove(this.#eventComponent);
+    remove(this.#eventEditComponent);
+  }
+
+  #replaceEventToForm = () => {
+    replace(this.#eventEditComponent, this.#eventComponent);
+  };
+
+  #replaceFormToEvent = () => {
+    replace(this.#eventComponent, this.#eventEditComponent);
+  };
+
+  #escKeyDownHandler = (evt) => {
+    if (evt.key === 'Escape') {
+      evt.preventDefault();
+      this.#replaceFormToEvent();
+      document.removeEventListener('keydown', this.#escKeyDownHandler);
+    }
+  };
+
+  #handleEditClick = () => {
+    this.#replaceEventToForm();
+    document.addEventListener('keydown', this.#escKeyDownHandler);
+  };
+
+  #handleFormSubmit = () => {
+    this.#replaceFormToEvent();
+    document.removeEventListener('keydown', this.#escKeyDownHandler);
+  };
 }
