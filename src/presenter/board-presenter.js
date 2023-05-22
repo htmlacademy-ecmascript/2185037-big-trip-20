@@ -17,6 +17,8 @@ export default class BoardPresenter {
 
   #events = [];
 
+  #eventPresenters = new Map();
+
   constructor({
     container,
     destinationsModel,
@@ -31,7 +33,7 @@ export default class BoardPresenter {
   }
 
   init(){
-    this.#events = this.#eventsModel.events;
+    this.#events = [...this.#eventsModel.events];
 
     this.#renderBoard();
   }
@@ -44,6 +46,13 @@ export default class BoardPresenter {
     });
 
     eventPresenter.init(event);
+
+    this.#eventPresenters.set(event.id, EventPresenter);
+  }
+
+  #clearEventList(){
+    this.#eventPresenters.forEach((presenter) => presenter.destroy());
+    this.#eventPresenters.clear();
   }
 
   #renderSort() {
