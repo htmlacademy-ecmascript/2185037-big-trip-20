@@ -12,14 +12,18 @@ export default class EventPresenter {
 
   #event = null;
 
+  #onDataChange = null;
+
   constructor({
     container,
     destinationsModel,
-    offersModel
+    offersModel,
+    onDataChange
   }){
     this.#container = container;
     this.#destinationsModel = destinationsModel;
     this.#offersModel = offersModel;
+    this.#onDataChange = onDataChange;
   }
 
   init(event){
@@ -34,14 +38,16 @@ export default class EventPresenter {
       event: this.#event,
       destination: this.#destinationsModel.getById(event.destination),
       offers: this.#offersModel.getByIds(offersByType, event.offers),
-      onEditClick: this.#handleEditClick
+      onEditClick: this.#editClickHandler,
+      onFavoriteClick: this.#favoriteClickHandler
     });
 
     this.#eventEditComponent = new EventEditView({
       event: this.#event,
       destinations: this.#destinationsModel.destinations,
       offers: this.#offersModel.offers,
-      onFormSubmit: this.#handleFormSubmit
+      onFormSubmit: this.#formSubmitHandler,
+      onResetClick: this.#resetButtonClickHandler
     });
 
     if(prevEventComponent === null || prevEventEditComponent === null){
@@ -68,10 +74,12 @@ export default class EventPresenter {
 
   #replaceEventToForm = () => {
     replace(this.#eventEditComponent, this.#eventComponent);
+    document.addEventListener('keydown', this.#escKeyDownHandler);
   };
 
   #replaceFormToEvent = () => {
     replace(this.#eventComponent, this.#eventEditComponent);
+    document.removeEventListener('keydown', this.#escKeyDownHandler);
   };
 
   #escKeyDownHandler = (evt) => {
@@ -82,13 +90,20 @@ export default class EventPresenter {
     }
   };
 
-  #handleEditClick = () => {
+  #editClickHandler = () => {
     this.#replaceEventToForm();
-    document.addEventListener('keydown', this.#escKeyDownHandler);
   };
 
-  #handleFormSubmit = () => {
+  #formSubmitHandler = (event) => {
+    this.#onDataChange(event);
     this.#replaceFormToEvent();
-    document.removeEventListener('keydown', this.#escKeyDownHandler);
+  };
+
+  #resetButtonClickHandler = () => {
+    this.#replaceFormToEvent();
+  };
+
+  #favoriteClickHandler = () => {
+    this.#onDataChange({...this.#event, isFavorite: !this.#event.isFavorite});
   };
 }

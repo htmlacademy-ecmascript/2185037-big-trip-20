@@ -3,6 +3,7 @@ import EventListView from '../view/event-list-view.js';
 import SortView from '../view/sort-view.js';
 import EventEmptyView from '../view/event-list-empty-view.js';
 import EventPresenter from './event-presenter.js';
+import { updateItem } from '../utils/common.js';
 
 
 export default class BoardPresenter {
@@ -43,12 +44,18 @@ export default class BoardPresenter {
       container: this.#eventListComponent.element,
       destinationsModel: this.#destinationsModel,
       offersModel: this.#offersModel,
+      onDataChange: this.#handleEventChange
     });
 
     eventPresenter.init(event);
 
-    this.#eventPresenters.set(event.id, EventPresenter);
+    this.#eventPresenters.set(event.id, eventPresenter);
   }
+
+  #handleEventChange = (updatedEvent) => {
+    this.#events = updateItem(this.#events, updatedEvent);
+    this.#eventPresenters.get(updatedEvent.id).init(updatedEvent);
+  };
 
   #clearEventList(){
     this.#eventPresenters.forEach((presenter) => presenter.destroy());
