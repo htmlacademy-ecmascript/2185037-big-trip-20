@@ -44,7 +44,8 @@ export default class BoardPresenter {
       container: this.#eventListComponent.element,
       destinationsModel: this.#destinationsModel,
       offersModel: this.#offersModel,
-      onDataChange: this.#handleEventChange
+      onDataChange: this.#handleEventChange,
+      onModeChange: this.#handleModeChange
     });
 
     eventPresenter.init(event);
@@ -55,6 +56,10 @@ export default class BoardPresenter {
   #handleEventChange = (updatedEvent) => {
     this.#events = updateItem(this.#events, updatedEvent);
     this.#eventPresenters.get(updatedEvent.id).init(updatedEvent);
+  };
+
+  #handleModeChange = () => {
+    this.#eventPresenters.forEach((presenter) => presenter.resetView());
   };
 
   #clearEventList(){

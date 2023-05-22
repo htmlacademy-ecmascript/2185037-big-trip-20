@@ -2,6 +2,11 @@ import { render, replace, remove } from '../framework/render.js';
 import EventView from '../view/event-view.js';
 import EventEditView from '../view/event-edit-view.js';
 
+const Mode = {
+  DEFAULT: 'DEFAULT',
+  EDITING: 'EDITING'
+};
+
 export default class EventPresenter {
   #container = null;
   #destinationsModel = null;
@@ -11,19 +16,23 @@ export default class EventPresenter {
   #eventEditComponent = null;
 
   #event = null;
+  #mode = Mode.DEFAULT;
 
   #onDataChange = null;
+  #onModeChange = null;
 
   constructor({
     container,
     destinationsModel,
     offersModel,
-    onDataChange
+    onDataChange,
+    onModeChange
   }){
     this.#container = container;
     this.#destinationsModel = destinationsModel;
     this.#offersModel = offersModel;
     this.#onDataChange = onDataChange;
+    this.#onModeChange = onModeChange;
   }
 
   init(event){
@@ -55,16 +64,22 @@ export default class EventPresenter {
       return;
     }
 
-    if(this.#container.contains(prevEventComponent.element)){
+    if(this.#mode === Mode.DEFAULT){
       replace(this.#eventComponent, prevEventComponent);
     }
 
-    if(this.#container.contains(prevEventEditComponent.element)){
+    if(this.#mode === Mode.EDITING){
       replace(this.#eventEditComponent, prevEventEditComponent);
     }
 
     remove(prevEventComponent);
     remove(prevEventEditComponent);
+  }
+
+  resetView(){
+    if(this.#mode !== Mode.DEFAULT){
+      this.#replaceFormToEvent();
+    }
   }
 
   destroy(){
@@ -75,11 +90,14 @@ export default class EventPresenter {
   #replaceEventToForm = () => {
     replace(this.#eventEditComponent, this.#eventComponent);
     document.addEventListener('keydown', this.#escKeyDownHandler);
+    this.#onModeChange();
+    this.#mode = Mode.EDITING;
   };
 
   #replaceFormToEvent = () => {
     replace(this.#eventComponent, this.#eventEditComponent);
     document.removeEventListener('keydown', this.#escKeyDownHandler);
+    this.#mode = Mode.DEFAULT;
   };
 
   #escKeyDownHandler = (evt) => {
