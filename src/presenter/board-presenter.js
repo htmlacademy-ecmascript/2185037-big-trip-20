@@ -1,14 +1,15 @@
-import { render, RenderPosition } from '../framework/render.js';
+import { remove, render, RenderPosition, replace } from '../framework/render.js';
 import EventListView from '../view/event-list-view.js';
 import SortView from '../view/sort-view.js';
 import EventEmptyView from '../view/event-list-empty-view.js';
 import EventPresenter from './event-presenter.js';
 import { updateItem } from '../utils/common.js';
-
+import { sort } from '../utils/sort.js';
+import { SortType } from '../const.js';
 
 export default class BoardPresenter {
   #eventListComponent = new EventListView();
-  #sortComponent = new SortView();
+  #sortComponent = null;
   #eventEmptyComponent = new EventEmptyView();
 
   #container = null;
@@ -19,6 +20,8 @@ export default class BoardPresenter {
   #events = [];
 
   #eventPresenters = new Map();
+
+  #currentSortType = SortType.DAY;
 
   constructor({
     container,
@@ -31,11 +34,11 @@ export default class BoardPresenter {
     this.#destinationsModel = destinationsModel;
     this.#offersModel = offersModel;
     this.#eventsModel = eventsModel;
+
+    this.#events = sort[SortType.DAY]([...this.#eventsModel.events]);
   }
 
   init(){
-    this.#events = [...this.#eventsModel.events];
-
     this.#renderBoard();
   }
 
@@ -53,10 +56,22 @@ export default class BoardPresenter {
     this.#eventPresenters.set(event.id, eventPresenter);
   }
 
+  #handleSortTypeChange = (sortType) => {
+    this.#sortEvents(sortType);
+    this.#clearEventList();
+    this.#renderSort(this.#container);
+    this.#renderEventList();
+  };
+
   #handleEventChange = (updatedEvent) => {
     this.#events = updateItem(this.#events, updatedEvent);
     this.#eventPresenters.get(updatedEvent.id).init(updatedEvent);
   };
+
+  #sortEvents(sortType){
+    this.#currentSortType = sortType;
+    this.#events = sort[this.#currentSortType]([...this.#events]);
+  }
 
   #handleModeChange = () => {
     this.#eventPresenters.forEach((presenter) => presenter.resetView());
@@ -68,6 +83,20 @@ export default class BoardPresenter {
   }
 
   #renderSort() {
+    const prevSortComponent = this.#sortComponent;
+
+    this.#sortComponent = new SortView({
+      sortType: this.#currentSortType,
+      onSortTypeChange: this.#handleSortTypeChange
+    });
+
+    if(prevSortComponent){
+      replace(this.#sortComponent, prevSortComponent);
+      remove(prevSortComponent);
+    }else{
+      render(this.#sortComponent, this.#container);
+    }
+
     render(this.#sortComponent, this.#container, RenderPosition.BEFOREEND);
   }
 
