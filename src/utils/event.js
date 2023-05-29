@@ -67,13 +67,13 @@ function getEventsDateDiff(eventA, eventB){
   return new Date(eventA.dateFrom) - new Date(eventB.dateFrom);
 }
 
-function getEventsPriceDiff(eventA, eventB){
+function getEventsDurationDiff(eventA, eventB){
   const durationA = new Date(eventA.dateTo) - new Date(eventA.dateFrom);
   const durationB = new Date(eventB.dateTo) - new Date(eventB.dateFrom);
   return durationB - durationA;
 }
 
-function getEventsDurationDiff(eventA, eventB){
+function getEventsPriceDiff(eventA, eventB){
   return eventB.basePrice - eventA.basePrice;
 }
 
