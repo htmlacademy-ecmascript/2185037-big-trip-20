@@ -63,6 +63,20 @@ function isEventPresent(event){
   return (dayjs().isAfter(event.dateFrom) && dayjs(event).isBefore(event.dateTo));
 }
 
+function getEventsDateDiff(eventA, eventB){
+  return new Date(eventA.dateFrom) - new Date(eventB.dateFrom);
+}
+
+function getEventsDurationDiff(eventA, eventB){
+  const durationA = new Date(eventA.dateTo) - new Date(eventA.dateFrom);
+  const durationB = new Date(eventB.dateTo) - new Date(eventB.dateFrom);
+  return durationB - durationA;
+}
+
+function getEventsPriceDiff(eventA, eventB){
+  return eventB.basePrice - eventA.basePrice;
+}
+
 export {
   getRandomArrayElement,
   humanizeEventDateShedule,
@@ -73,5 +87,8 @@ export {
   humanizeEventDurationTime,
   isEventFuture,
   isEventPast,
-  isEventPresent
+  isEventPresent,
+  getEventsDateDiff,
+  getEventsPriceDiff,
+  getEventsDurationDiff
 };
