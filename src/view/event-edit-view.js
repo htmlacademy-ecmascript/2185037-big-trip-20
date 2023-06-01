@@ -1,4 +1,4 @@
-import AbstractView from '../framework/view/abstract-view.js';
+import AbstractStatefulView from '../framework/view/abstract-stateful-view.js';
 import { TYPES_EVENT } from '../const.js';
 import { humanizeEventDateForm } from '../utils/event.js';
 
@@ -48,7 +48,7 @@ function createOffersList(event, offers){
       ${offersByType.map(({id, price, title}) =>
       (
         `<div class="event__offer-selector">
-        <input class="event__offer-checkbox  visually-hidden" id="event-offer-${id}" type="checkbox" name="event-offer-${id}" ${ offersByIds.find((offer) => id === offer.id) ? 'checked' : ''}>
+        <input class="event__offer-checkbox  visually-hidden" data-offer-id="${id}" id="event-offer-${id}" type="checkbox" name="event-offer-${id}" ${ offersByIds.find((offer) => id === offer.id) ? 'checked' : ''}>
         <label class="event__offer-label" for="event-offer-${id}">
           <span class="event__offer-title">${title}</span>
           &plus;&euro;&nbsp;
@@ -69,7 +69,8 @@ function createPhotosList(pictures){
   );
 }
 
-function createEventEditTemplate(event, destinations, offers){
+function createEventEditTemplate({state, destinations, offers}){
+  const {event} = state;
   const {basePrice, dateFrom, dateTo, type} = event;
 
   const destination = destinations.find((item) => item.id === event.destination);
@@ -128,8 +129,8 @@ function createEventEditTemplate(event, destinations, offers){
   );
 }
 
-export default class EventEditView extends AbstractView {
-  #event = null;
+export default class EventEditView extends AbstractStatefulView {
+
   #destinations = null;
   #offers = null;
   #handleFormSubmit = null;
@@ -137,27 +138,104 @@ export default class EventEditView extends AbstractView {
 
   constructor({event, destinations, offers, onFormSubmit, onResetClick}){
     super();
-    this.#event = event;
+
+    this._setState(EventEditView.parseEventToState({event}));
+
     this.#destinations = destinations;
     this.#offers = offers;
     this.#handleFormSubmit = onFormSubmit;
     this.#handleFormReset = onResetClick;
 
-    this.element.querySelector('form').addEventListener('submit', this.#formSubmitHandler);
-    this.element.querySelector('.event__rollup-btn').addEventListener('click', this.#resetButtonClickHandler);
+    this._restoreHandlers();
   }
 
   get template(){
-    return createEventEditTemplate(this.#event, this.#destinations, this.#offers);
+    return createEventEditTemplate({
+      state: this._state,
+      destinations: this.#destinations,
+      offers: this.#offers});
   }
+
+  reset = (event) => this.updateElement({event});
+
+  _restoreHandlers = () => {
+    this.element.querySelector('.event__rollup-btn').addEventListener('click', this.#resetButtonClickHandler);
+    this.element.querySelector('form').addEventListener('submit', this.#formSubmitHandler);
+    this.element.querySelectorAll('.event__type-input').forEach((element) => {
+      element.addEventListener('change', this.#typeInputClick);
+    });
+    this.element.querySelector('.event__input--price').addEventListener('change', this.#priceInputChange);
+    this.element.querySelector('.event__input--destination').addEventListener('change', this.#destinationInputChange);
+
+    const offerBlock = this.element.querySelector('.event__available-offers');
+
+    if(offerBlock){
+      offerBlock.addEventListener('change', this.#offerClickHanlder);
+    }
+  };
 
   #formSubmitHandler = (evt) => {
     evt.preventDefault();
-    this.#handleFormSubmit(this.#event);
+    this.#handleFormSubmit(EventEditView.parseStateToEvent(this._state));
   };
 
   #resetButtonClickHandler = (evt) => {
     evt.preventDefault();
     this.#handleFormReset();
   };
+
+  #typeInputClick = (evt) => {
+    evt.preventDefault();
+
+    this.updateElement({
+      event: {
+        ...this._state.event,
+        type: evt.target.value,
+        offers: []
+      }
+    });
+  };
+
+  #offerClickHanlder = (evt) => {
+    evt.preventDefault();
+
+    const checkedBoxes = Array.from(this.element.querySelectorAll('.event__offer-checkbox:checked'));
+
+    this._setState({
+      event: {
+        ...this._state.event,
+        offers: checkedBoxes.map((element) => element.dataset.offerId)
+      }
+    });
+  };
+
+  #priceInputChange = (evt) => {
+    evt.preventDefault();
+
+    this._setState({
+      event: {
+        ...this._state.event,
+        basePrice: evt.target.value
+      }
+    });
+  };
+
+  #destinationInputChange = (evt) => {
+    evt.preventDefault();
+
+    const selectedDestination = this.#destinations.find((destination) => destination.name === evt.target.value);
+
+    const selectedDestinationId = (selectedDestination) ? selectedDestination.id : null;
+
+    this.updateElement({
+      event: {
+        ...this._state.event,
+        destination: selectedDestinationId
+      }
+    });
+  };
+
+  static parseEventToState = ({event}) => ({event});
+
+  static parseStateToEvent = (state) => state.event;
 }
