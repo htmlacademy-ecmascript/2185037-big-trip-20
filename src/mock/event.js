@@ -2,8 +2,8 @@ const Events = [
   {
     'id': '3f6ad7df-77ec-478d-b2c5-10cf3fe02b38',
     'basePrice': 265,
-    'dateFrom': '2023-11-23T18:28:01.397Z',
-    'dateTo': '2023-11-24T23:28:01.397Z',
+    'dateFrom': '2022-11-23T18:28:01.397Z',
+    'dateTo': '2022-11-24T23:28:01.397Z',
     'destination': 'c2fc3868-4829-4ae9-afe5-eca4c1c26b7c',
     'isFavorite': true,
     'offers': [
