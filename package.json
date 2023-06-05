@@ -27,7 +27,8 @@
     "style-loader": "3.3.2",
     "webpack": "5.80.0",
     "webpack-cli": "5.0.2",
-    "webpack-dev-server": "4.13.3"
+    "webpack-dev-server": "4.13.3",
+    "flatpickr": "4.6.13"
   },
   "engines": {
     "node": "18"

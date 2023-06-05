@@ -2,6 +2,9 @@ import AbstractStatefulView from '../framework/view/abstract-stateful-view.js';
 import { TYPES_EVENT } from '../const.js';
 import { humanizeEventDateForm } from '../utils/event.js';
 
+import 'flatpickr/dist/flatpickr.min.css';
+import flatpickr from 'flatpickr';
+
 function createTypeList(typeEvent){
   return (
     `<div class="event__type-list">
@@ -136,6 +139,9 @@ export default class EventEditView extends AbstractStatefulView {
   #handleFormSubmit = null;
   #handleFormReset = null;
 
+  #datepickerFrom = null;
+  #datepickerTo = null;
+
   constructor({event, destinations, offers, onFormSubmit, onResetClick}){
     super();
 
@@ -171,6 +177,73 @@ export default class EventEditView extends AbstractStatefulView {
 
     if(offerBlock){
       offerBlock.addEventListener('change', this.#offerClickHanlder);
+    }
+
+    this.#setDatepickers();
+  };
+
+  #setDatepickers = () => {
+    this.#datepickerFrom = flatpickr(
+      this.element.querySelector('#event-start-time-1'),
+      {
+        dateFormat: 'd/m/y H:i',
+        defaultDate: this._state.event.dateFrom,
+        onClose: this.#dateFromChangeHandler,
+        enableTime: true,
+        maxDate: this._state.event.dateTo,
+        locale: {
+          firstDayOfWeek: 1
+        },
+        'time_24hr': true
+      });
+
+    this.#datepickerTo = flatpickr(
+      this.element.querySelector('#event-end-time-1'),
+      {
+        dateFormat: 'd/m/y H:i',
+        defaultDate: this._state.event.dateTo,
+        onClose: this.#dateToChangeHandler,
+        enableTime: true,
+        minDate: this._state.event.dateFrom,
+        locale: {
+          firstDayOfWeek: 1
+        },
+        'time_24hr': true
+      }
+    );
+  };
+
+  #dateFromChangeHandler = ([userDate]) => {
+    this._setState({
+      event: {
+        ...this._state.event,
+        dateFrom: userDate
+      }
+    });
+    this.#datepickerTo.set('minDate', this._state.event.dateFrom);
+  };
+
+  #dateToChangeHandler = ([userDate]) => {
+    this._setState({
+      event: {
+        ...this._state.event,
+        dateTo: userDate
+      }
+    });
+    this.#datepickerFrom.set('maxDate', this._state.event.dateTo);
+  };
+
+  removeElement = () => {
+    super.removeElement();
+
+    if(this.#datepickerFrom){
+      this.#datepickerFrom.destroy();
+      this.#datepickerFrom = null;
+    }
+
+    if(this.#datepickerTo){
+      this.#datepickerTo.destroy();
+      this.#datepickerTo = null;
     }
   };
 
