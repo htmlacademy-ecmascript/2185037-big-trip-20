@@ -57,10 +57,14 @@ export default class BoardPresenter {
   }
 
   #handleSortTypeChange = (sortType) => {
+    if (this.#currentSortType === sortType) {
+      return;
+    }
+
     this.#currentSortType = sortType;
-    this.#clearEventList();
-    this.#renderSort(this.#container);
-    this.#renderEventList();
+
+    this.#clearBoard();
+    this.#renderBoard();
   };
 
   #handleViewAction = (actionType, updateType, update) => {
@@ -85,8 +89,12 @@ export default class BoardPresenter {
         this.#eventPresenters.get(data.id).init(data);
         break;
       case UpdateType.MINOR:
+        this.#clearBoard();
+        this.#renderBoard();
         break;
       case UpdateType.MAJOR:
+        this.#clearBoard({resetSortType: true});
+        this.#renderBoard();
         break;
     }
   };
@@ -100,11 +108,22 @@ export default class BoardPresenter {
     this.#eventPresenters.clear();
   }
 
+  #clearBoard({resetSortType = false} = {}){
+    this.#clearEventList();
+
+    remove(this.#sortComponent);
+    remove(this.#eventEmptyComponent);
+
+    if(resetSortType){
+      this.#currentSortType = SortType.DAY;
+    }
+  }
+
   #renderSort() {
     const prevSortComponent = this.#sortComponent;
 
     this.#sortComponent = new SortView({
-      sortType: this.#currentSortType,
+      currentSortType: this.#currentSortType,
       onSortTypeChange: this.#handleSortTypeChange
     });
 
