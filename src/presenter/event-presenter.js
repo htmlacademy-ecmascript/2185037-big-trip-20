@@ -2,6 +2,7 @@ import { render, replace, remove } from '../framework/render.js';
 import EventView from '../view/event-view.js';
 import EventEditView from '../view/event-edit-view.js';
 import { UpdateType, UserAction } from '../const.js';
+import { isDatesEqual, isPricesEqual } from '../utils/event.js';
 
 const Mode = {
   DEFAULT: 'DEFAULT',
@@ -57,7 +58,8 @@ export default class EventPresenter {
       destinations: this.#destinationsModel.destinations,
       offers: this.#offersModel.offers,
       onFormSubmit: this.#formSubmitHandler,
-      onResetClick: this.#resetButtonClickHandler
+      onResetClick: this.#resetButtonClickHandler,
+      onDeleteClick: this.#deleteClickHandler,
     });
 
     if(prevEventComponent === null || prevEventEditComponent === null){
@@ -113,9 +115,24 @@ export default class EventPresenter {
     this.#replaceEventToForm();
   };
 
-  #formSubmitHandler = (event) => {
-    this.#onDataChange(event);
+  #formSubmitHandler = (update) => {
+    const isMinorUpdate = isDatesEqual(this.#event.dateFrom, update.dateFrom) || isDatesEqual(this.#event.dateTo, update.dateTo) || isPricesEqual(this.#event.basePrice, update.basePrice);
+
+    this.#onDataChange(
+      UserAction.UPDATE_EVENT,
+      isMinorUpdate ? UpdateType.MINOR : UpdateType.PATCH,
+      update
+    );
+
     this.#replaceFormToEvent();
+  };
+
+  #deleteClickHandler = (event) => {
+    this.#onDataChange(
+      UserAction.DELETE_EVENT,
+      UpdateType.MINOR,
+      event,
+    );
   };
 
   #resetButtonClickHandler = () => {
