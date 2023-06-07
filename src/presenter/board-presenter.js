@@ -3,7 +3,7 @@ import EventListView from '../view/event-list-view.js';
 import SortView from '../view/sort-view.js';
 import EventEmptyView from '../view/event-list-empty-view.js';
 import EventPresenter from './event-presenter.js';
-import { updateItem } from '../utils/common.js';
+// import { updateItem } from '../utils/common.js';
 import { sort } from '../utils/sort.js';
 import { SortType } from '../const.js';
 
@@ -17,7 +17,7 @@ export default class BoardPresenter {
   #offersModel = null;
   #eventsModel = null;
 
-  #events = [];
+  // #events = [];
 
   #eventPresenters = new Map();
 
@@ -34,12 +34,14 @@ export default class BoardPresenter {
     this.#destinationsModel = destinationsModel;
     this.#offersModel = offersModel;
     this.#eventsModel = eventsModel;
-
-    this.#events = sort[SortType.DAY]([...this.#eventsModel.events]);
   }
 
   init(){
     this.#renderBoard();
+  }
+
+  get events(){
+    return sort[SortType.DAY]([...this.#eventsModel.events]);
   }
 
   #renderEvent(event){
@@ -57,21 +59,15 @@ export default class BoardPresenter {
   }
 
   #handleSortTypeChange = (sortType) => {
-    this.#sortEvents(sortType);
+    this.#currentSortType = sortType;
     this.#clearEventList();
     this.#renderSort(this.#container);
     this.#renderEventList();
   };
 
   #handleEventChange = (updatedEvent) => {
-    this.#events = updateItem(this.#events, updatedEvent);
     this.#eventPresenters.get(updatedEvent.id).init(updatedEvent);
   };
-
-  #sortEvents(sortType){
-    this.#currentSortType = sortType;
-    this.#events = sort[this.#currentSortType]([...this.#events]);
-  }
 
   #handleModeChange = () => {
     this.#eventPresenters.forEach((presenter) => presenter.resetView());
@@ -104,14 +100,14 @@ export default class BoardPresenter {
     render(this.#eventEmptyComponent, this.#container, RenderPosition.BEFOREEND);
   }
 
-  #renderEvents(){
-    this.#events.forEach((event) => this.#renderEvent(event));
+  #renderEvents(events){
+    events.forEach((event) => this.#renderEvent(event));
   }
 
   #renderEventList(){
     render(this.#eventListComponent, this.#container);
 
-    this.#renderEvents();
+    this.#renderEvents(this.#eventsModel.events);
   }
 
   #renderBoard(){
