@@ -5,6 +5,7 @@ import EventEmptyView from '../view/event-list-empty-view.js';
 import EventPresenter from './event-presenter.js';
 import { sort } from '../utils/sort.js';
 import { SortType, UpdateType, UserAction } from '../const.js';
+import { filter } from '../utils/filter.js';
 
 export default class BoardPresenter {
   #eventListComponent = new EventListView();
@@ -15,6 +16,7 @@ export default class BoardPresenter {
   #destinationsModel = null;
   #offersModel = null;
   #eventsModel = null;
+  #filterModel = null;
 
   #eventPresenters = new Map();
 
@@ -24,13 +26,15 @@ export default class BoardPresenter {
     container,
     destinationsModel,
     offersModel,
-    eventsModel
+    eventsModel,
+    filterModel
   }){
     this.#container = container;
 
     this.#destinationsModel = destinationsModel;
     this.#offersModel = offersModel;
     this.#eventsModel = eventsModel;
+    this.#filterModel = filterModel;
   }
 
   init(){

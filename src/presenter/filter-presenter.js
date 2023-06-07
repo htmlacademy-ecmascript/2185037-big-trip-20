@@ -22,12 +22,11 @@ export default class FilterPresenter {
   get filters(){
     const events = this.#eventsModel.events;
 
-    return Object.entries(FilterType).map(
-      ([filterType, filterEvents]) => ({
+    return Object.entries(filter)
+      .map(([filterType, filterEvents]) => ({
         type: filterType,
         hasEvents: filterEvents(events).length > 0,
-      }),
-    );
+      }));
   }
 
   init(){
