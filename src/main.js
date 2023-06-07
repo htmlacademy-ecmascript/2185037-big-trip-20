@@ -4,6 +4,7 @@ import FilterPresenter from './presenter/filter-presenter.js';
 import EventModel from './model/events-model.js';
 import DestinationModel from './model/destinations-model.js';
 import OfferModel from './model/offers-model.js';
+import FilterModel from './model/filter-model.js';
 
 import MockService from './service/mock-service.js';
 
@@ -16,6 +17,7 @@ const mockService = new MockService();
 const destinationsModel = new DestinationModel(mockService);
 const offersModel = new OfferModel(mockService);
 const eventsModel = new EventModel(mockService);
+const filterModel = new FilterModel();
 
 const filterPresenter = new FilterPresenter({
   filterContainer: siteFiltersElement,
