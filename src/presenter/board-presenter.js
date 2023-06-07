@@ -3,7 +3,6 @@ import EventListView from '../view/event-list-view.js';
 import SortView from '../view/sort-view.js';
 import EventEmptyView from '../view/event-list-empty-view.js';
 import EventPresenter from './event-presenter.js';
-// import { updateItem } from '../utils/common.js';
 import { sort } from '../utils/sort.js';
 import { SortType, UpdateType, UserAction } from '../const.js';
 
@@ -39,7 +38,7 @@ export default class BoardPresenter {
   }
 
   get events(){
-    return sort[SortType.DAY]([...this.#eventsModel.events]);
+    return sort[this.#currentSortType]([...this.#eventsModel.events]);
   }
 
   #renderEvent(event){
@@ -148,7 +147,7 @@ export default class BoardPresenter {
   #renderEventList(){
     render(this.#eventListComponent, this.#container);
 
-    this.#renderEvents(this.#eventsModel.events);
+    this.#renderEvents(this.events);
   }
 
   #renderBoard(){
