@@ -17,8 +17,6 @@ export default class BoardPresenter {
   #offersModel = null;
   #eventsModel = null;
 
-  // #events = [];
-
   #eventPresenters = new Map();
 
   #currentSortType = SortType.DAY;
@@ -49,7 +47,7 @@ export default class BoardPresenter {
       container: this.#eventListComponent.element,
       destinationsModel: this.#destinationsModel,
       offersModel: this.#offersModel,
-      onDataChange: this.#handleEventChange,
+      onDataChange: this.#handleViewAction,
       onModeChange: this.#handleModeChange
     });
 
@@ -65,9 +63,13 @@ export default class BoardPresenter {
     this.#renderEventList();
   };
 
-  #handleEventChange = (updatedEvent) => {
-    this.#eventPresenters.get(updatedEvent.id).init(updatedEvent);
+  #handleViewAction = (actionType, updateType, update) => {
+    console.log(actionType, updateType, update);
   };
+
+  #handleModelEvent = (updateType, update) => {
+    console.log(updateType, update);
+  }
 
   #handleModeChange = () => {
     this.#eventPresenters.forEach((presenter) => presenter.resetView());

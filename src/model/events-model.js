@@ -17,4 +17,19 @@ export default class EventModel extends Observable {
   hasEvents(){
     return this.#events.length <= 1;
   }
+
+  update(updateType, update){
+    this.#events = this.#service.updateEvent(update);
+    this._notify(updateType, update);
+  }
+
+  add(updateType, event){
+    this.#events = this.#service.addEvent(event);
+    this._notify(updateType, event);
+  }
+
+  delete(updateType, event){
+    this.#events = this.#service.deleteEvent(event);
+    this._notify(updateType, event);
+  }
 }

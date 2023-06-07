@@ -15,4 +15,16 @@ const SortType = {
   OFFER: 'offer'
 };
 
-export {TYPES_EVENT, TEXT, FilterType, SortType};
+const UserAction = {
+  UPDATE_EVENT: 'UPDATE_EVENT',
+  ADD_EVENT: 'ADD_EVENT',
+  DELETE_EVENT: 'DELETE_EVENT'
+};
+
+const UpdateType = {
+  PATCH: 'PATCH',
+  MINOR: 'MINOR',
+  MAJOR: 'MAJOR'
+};
+
+export {TYPES_EVENT, TEXT, FilterType, SortType, UserAction, UpdateType};
