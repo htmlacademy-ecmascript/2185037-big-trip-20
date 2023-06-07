@@ -21,6 +21,7 @@ const filterModel = new FilterModel();
 
 const filterPresenter = new FilterPresenter({
   filterContainer: siteFiltersElement,
+  filterModel,
   eventsModel
 });
 
