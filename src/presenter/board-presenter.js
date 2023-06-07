@@ -5,7 +5,7 @@ import EventEmptyView from '../view/event-list-empty-view.js';
 import EventPresenter from './event-presenter.js';
 // import { updateItem } from '../utils/common.js';
 import { sort } from '../utils/sort.js';
-import { SortType } from '../const.js';
+import { SortType, UpdateType, UserAction } from '../const.js';
 
 export default class BoardPresenter {
   #eventListComponent = new EventListView();
@@ -65,11 +65,31 @@ export default class BoardPresenter {
 
   #handleViewAction = (actionType, updateType, update) => {
     console.log(actionType, updateType, update);
+    switch (actionType) {
+      case UserAction.UPDATE_EVENT:
+        this.#eventsModel.update(updateType, update);
+        break;
+      case UserAction.ADD_EVENT:
+        this.#eventsModel.add(updateType, update);
+        break;
+      case UserAction.DELETE_EVENT:
+        this.#eventsModel.delete(updateType,update);
+        break;
+    }
   };
 
-  #handleModelEvent = (updateType, update) => {
-    console.log(updateType, update);
-  }
+  #handleModelEvent = (updateType, data) => {
+    console.log(updateType, data);
+    switch (UpdateType) {
+      case UpdateType.PATCH:
+        this.#eventPresenters.get(data.id).init(data);
+        break;
+      case UpdateType.MINOR:
+        break;
+      case UpdateType.MAJOR:
+        break;
+    }
+  };
 
   #handleModeChange = () => {
     this.#eventPresenters.forEach((presenter) => presenter.resetView());
