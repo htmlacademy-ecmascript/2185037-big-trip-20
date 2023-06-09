@@ -4,13 +4,13 @@ import SortView from '../view/sort-view.js';
 import EventEmptyView from '../view/event-list-empty-view.js';
 import EventPresenter from './event-presenter.js';
 import { sort } from '../utils/sort.js';
-import { SortType, UpdateType, UserAction } from '../const.js';
+import { SortType, UpdateType, UserAction, FilterType } from '../const.js';
 import { filter } from '../utils/filter.js';
 
 export default class BoardPresenter {
   #eventListComponent = new EventListView();
   #sortComponent = null;
-  #eventEmptyComponent = new EventEmptyView();
+  #eventEmptyComponent = null;
 
   #container = null;
   #destinationsModel = null;
@@ -21,6 +21,7 @@ export default class BoardPresenter {
   #eventPresenters = new Map();
 
   #currentSortType = SortType.DAY;
+  #filterType = FilterType.EVERYTHING;
 
   constructor({
     container,
@@ -45,9 +46,9 @@ export default class BoardPresenter {
   }
 
   get events(){
-    const filterType = this.#filterModel.filter;
+    this.#filterType = this.#filterModel.filter;
     const events = this.#eventsModel.events;
-    const filteredEvents = filter[filterType](events);
+    const filteredEvents = filter[this.#filterType](events);
 
     return sort[this.#currentSortType](filteredEvents);
   }
@@ -122,7 +123,10 @@ export default class BoardPresenter {
     this.#clearEventList();
 
     remove(this.#sortComponent);
-    remove(this.#eventEmptyComponent);
+
+    if(this.#eventEmptyComponent){
+      remove(this.#eventEmptyComponent);
+    }
 
     if(resetSortType){
       this.#currentSortType = SortType.DAY;
@@ -148,6 +152,9 @@ export default class BoardPresenter {
   }
 
   #renderEventEmpty(){
+    this.#eventEmptyComponent = new EventEmptyView({
+      filterType: this.#filterType
+    });
     render(this.#eventEmptyComponent, this.#container, RenderPosition.BEFOREEND);
   }
 
