@@ -35,6 +35,9 @@ export default class BoardPresenter {
     this.#offersModel = offersModel;
     this.#eventsModel = eventsModel;
     this.#filterModel = filterModel;
+
+    this.#eventsModel.addObserver(this.#handleModelEvent);
+    this.#filterModel.addObserver(this.#handleModelEvent);
   }
 
   init(){
@@ -42,7 +45,11 @@ export default class BoardPresenter {
   }
 
   get events(){
-    return sort[this.#currentSortType]([...this.#eventsModel.events]);
+    const filterType = this.#filterModel.filter;
+    const events = this.#eventsModel.events;
+    const filteredEvents = filter[filterType](events);
+
+    return sort[this.#currentSortType](filteredEvents);
   }
 
   #renderEvent(event){
