@@ -11,6 +11,7 @@ import MockService from './service/mock-service.js';
 const siteMainElement = document.querySelector('main');
 const siteHeaderElement = document.querySelector('header');
 const siteFiltersElement = siteHeaderElement.querySelector('.trip-controls__filters');
+const siteNewEventContainer = siteHeaderElement.querySelector('.trip-main');
 const siteBoardElement = siteMainElement.querySelector('.trip-events');
 
 const mockService = new MockService();
@@ -27,10 +28,11 @@ const filterPresenter = new FilterPresenter({
 
 const boardPresenter = new BoardPresenter({
   container: siteBoardElement,
+  newEventContainer: siteNewEventContainer,
   destinationsModel,
   offersModel,
   eventsModel,
-  filterModel
+  filterModel,
 });
 
 filterPresenter.init();

@@ -15,21 +15,35 @@ export default class EventModel extends Observable {
   }
 
   hasEvents(){
-    return this.#events.length <= 1;
+    return this.#events.length < 1;
   }
 
   update(updateType, update){
-    this.#events = this.#service.updateEvent(update);
+    const index = this.#events.findIndex((event) => event.id === update.id);
+
+    this.#events = [
+      ...this.#events.slice(0, index),
+      update,
+      ...this.#events.slice(index + 1)
+    ];
     this._notify(updateType, update);
   }
 
-  add(updateType, event){
-    this.#events = this.#service.addEvent(event);
-    this._notify(updateType, event);
+  add(updateType, update){
+    this.#events = [
+      update,
+      ...this.#events
+    ];
+    this._notify(updateType, update);
   }
 
-  delete(updateType, event){
-    this.#events = this.#service.deleteEvent(event);
-    this._notify(updateType, event);
+  delete(updateType, update){
+    const index = this.#events.findIndex((event) => event.id === update.id);
+
+    this.#events = [
+      ...this.#events.slice(0, index),
+      ...this.#events.slice(index + 1)
+    ];
+    this._notify(updateType, update);
   }
 }

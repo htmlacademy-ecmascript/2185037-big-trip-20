@@ -27,4 +27,21 @@ const UpdateType = {
   MAJOR: 'MAJOR'
 };
 
-export {TYPES_EVENT, TEXT, FilterType, SortType, UserAction, UpdateType};
+const EditType = {
+  EDITING: 'EDITING',
+  CREATING: 'CREATING'
+};
+
+const DEFAULT_TYPE = 'flight';
+
+const EVENT_BLANK = {
+  'basePrice': 0,
+  'dateFrom': null,
+  'dateTo': null,
+  'destination': null,
+  'isFavorite': false,
+  'offers': [],
+  'type': DEFAULT_TYPE
+};
+
+export {TYPES_EVENT, TEXT, FilterType, SortType, UserAction, UpdateType, EditType, EVENT_BLANK};

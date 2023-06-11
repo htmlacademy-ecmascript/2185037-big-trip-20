@@ -24,30 +24,4 @@ export default class MockService {
   get offers(){
     return this.#offers;
   }
-
-  updateEvent(update){
-    const index = this.#events.findIndex((event) => event.id === update.id);
-
-    this.#events = [
-      ...this.#events.slice(0, index),
-      update,
-      ...this.#events.slice(index + 1)
-    ];
-  }
-
-  addEvent(event){
-    this.#events = [
-      event,
-      ...this.#events
-    ];
-  }
-
-  deleteEvent(update){
-    const index = this.#events.findIndex((event) => event.id === update.id);
-
-    this.#events = [
-      ...this.#events.slice(0, index),
-      ...this.#events.slice(index + 1)
-    ];
-  }
 }

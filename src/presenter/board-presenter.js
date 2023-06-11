@@ -3,6 +3,9 @@ import EventListView from '../view/event-list-view.js';
 import SortView from '../view/sort-view.js';
 import EventEmptyView from '../view/event-list-empty-view.js';
 import EventPresenter from './event-presenter.js';
+import NewEventPresenter from './new-event-presenter.js';
+import NewEventButtonView from '../view/new-event-button-view.js';
+
 import { sort } from '../utils/sort.js';
 import { SortType, UpdateType, UserAction, FilterType } from '../const.js';
 import { filter } from '../utils/filter.js';
@@ -11,6 +14,8 @@ export default class BoardPresenter {
   #eventListComponent = new EventListView();
   #sortComponent = null;
   #eventEmptyComponent = null;
+  #newEventButton = null;
+  #newEventButtonContainer = null;
 
   #container = null;
   #destinationsModel = null;
@@ -19,29 +24,45 @@ export default class BoardPresenter {
   #filterModel = null;
 
   #eventPresenters = new Map();
+  #newEventPresenter = null;
 
   #currentSortType = SortType.DAY;
   #filterType = FilterType.EVERYTHING;
+  #isCreating = false;
 
   constructor({
     container,
+    newEventContainer,
     destinationsModel,
     offersModel,
     eventsModel,
-    filterModel
+    filterModel,
   }){
     this.#container = container;
-
+    this.#newEventButtonContainer = newEventContainer;
     this.#destinationsModel = destinationsModel;
     this.#offersModel = offersModel;
     this.#eventsModel = eventsModel;
     this.#filterModel = filterModel;
+
+    this.#newEventPresenter = new NewEventPresenter({
+      eventListContainer: this.#eventListComponent.element,
+      destinationsModel: this.#destinationsModel,
+      offersModel: this.#offersModel,
+      onDataChange: this.#handleViewAction,
+      onDestroy: this.#handleNewEventDestroy
+    });
 
     this.#eventsModel.addObserver(this.#handleModelEvent);
     this.#filterModel.addObserver(this.#handleModelEvent);
   }
 
   init(){
+    this.#newEventButton = new NewEventButtonView({
+      onClick: this.#handleNewEventButtonClick
+    });
+    render(this.#newEventButton, this.#newEventButtonContainer);
+
     this.#renderBoard();
   }
 
@@ -79,7 +100,6 @@ export default class BoardPresenter {
   };
 
   #handleViewAction = (actionType, updateType, update) => {
-    console.log(actionType, updateType, update);
     switch (actionType) {
       case UserAction.UPDATE_EVENT:
         this.#eventsModel.update(updateType, update);
@@ -94,8 +114,7 @@ export default class BoardPresenter {
   };
 
   #handleModelEvent = (updateType, data) => {
-    console.log(updateType, data);
-    switch (UpdateType) {
+    switch (updateType) {
       case UpdateType.PATCH:
         this.#eventPresenters.get(data.id).init(data);
         break;
@@ -111,10 +130,12 @@ export default class BoardPresenter {
   };
 
   #handleModeChange = () => {
+    this.#newEventPresenter.destroy();
     this.#eventPresenters.forEach((presenter) => presenter.resetView());
   };
 
   #clearEventList(){
+    this.#newEventPresenter.destroy();
     this.#eventPresenters.forEach((presenter) => presenter.destroy());
     this.#eventPresenters.clear();
   }
@@ -164,18 +185,40 @@ export default class BoardPresenter {
 
   #renderEventList(){
     render(this.#eventListComponent, this.#container);
-
-    this.#renderEvents(this.events);
   }
 
   #renderBoard(){
 
-    if(this.#eventsModel.hasEvents()){
+    if(this.#eventsModel.hasEvents() && !this.#isCreating){
       this.#renderEventEmpty();
       return;
     }
 
     this.#renderSort();
     this.#renderEventList();
+    this.#renderEvents(this.events);
   }
+
+  createEvent(){
+    this.#currentSortType = SortType.DAY;
+    this.#filterModel.setFilter(UpdateType.MAJOR, FilterType.EVERYTHING);
+    this.#newEventPresenter.init();
+  }
+
+  #handleNewEventButtonClick = () => {
+    this.#isCreating = true;
+    this.createEvent();
+    this.#newEventButton.setDisabled(true);
+  };
+
+  #handleNewEventDestroy = () => {
+    this.#isCreating = false;
+    this.#newEventButton.setDisabled(false);
+
+    if(this.#eventsModel.hasEvents()){
+      remove(this.#sortComponent);
+      this.#sortComponent = null;
+      this.#renderEventEmpty();
+    }
+  };
 }
