@@ -7,6 +7,8 @@ import {
   humanizeEventDurationTime
 } from '../utils/event.js';
 
+import he from 'he';
+
 function createOffersTemplate(offers){
   return (
     `<ul class="event__selected-offers">
@@ -44,7 +46,7 @@ function createEventTemplate(event, destination, offers){
           <p class="event__duration">${humanizeEventDurationTime(dateFrom,dateTo)}</p>
         </div>
         <p class="event__price">
-          &euro;&nbsp;<span class="event__price-value">${basePrice}</span>
+          &euro;&nbsp;<span class="event__price-value">${he.encode(basePrice.toString())}</span>
         </p>
         <h4 class="visually-hidden">Offers:</h4>
         ${offersTemplate}
