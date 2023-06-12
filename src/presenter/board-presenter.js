@@ -3,43 +3,75 @@ import EventListView from '../view/event-list-view.js';
 import SortView from '../view/sort-view.js';
 import EventEmptyView from '../view/event-list-empty-view.js';
 import EventPresenter from './event-presenter.js';
-import { updateItem } from '../utils/common.js';
+import NewEventPresenter from './new-event-presenter.js';
+import NewEventButtonView from '../view/new-event-button-view.js';
+
 import { sort } from '../utils/sort.js';
-import { SortType } from '../const.js';
+import { SortType, UpdateType, UserAction, FilterType } from '../const.js';
+import { filter } from '../utils/filter.js';
 
 export default class BoardPresenter {
   #eventListComponent = new EventListView();
   #sortComponent = null;
-  #eventEmptyComponent = new EventEmptyView();
+  #eventEmptyComponent = null;
+  #newEventButton = null;
+  #newEventButtonContainer = null;
 
   #container = null;
   #destinationsModel = null;
   #offersModel = null;
   #eventsModel = null;
-
-  #events = [];
+  #filterModel = null;
 
   #eventPresenters = new Map();
+  #newEventPresenter = null;
 
   #currentSortType = SortType.DAY;
+  #filterType = FilterType.EVERYTHING;
+  #isCreating = false;
 
   constructor({
     container,
+    newEventContainer,
     destinationsModel,
     offersModel,
-    eventsModel
+    eventsModel,
+    filterModel,
   }){
     this.#container = container;
-
+    this.#newEventButtonContainer = newEventContainer;
     this.#destinationsModel = destinationsModel;
     this.#offersModel = offersModel;
     this.#eventsModel = eventsModel;
+    this.#filterModel = filterModel;
 
-    this.#events = sort[SortType.DAY]([...this.#eventsModel.events]);
+    this.#newEventPresenter = new NewEventPresenter({
+      eventListContainer: this.#eventListComponent.element,
+      destinationsModel: this.#destinationsModel,
+      offersModel: this.#offersModel,
+      onDataChange: this.#handleViewAction,
+      onDestroy: this.#handleNewEventDestroy
+    });
+
+    this.#eventsModel.addObserver(this.#handleModelEvent);
+    this.#filterModel.addObserver(this.#handleModelEvent);
   }
 
   init(){
+    this.#newEventButton = new NewEventButtonView({
+      onClick: this.#handleNewEventButtonClick
+    });
+    render(this.#newEventButton, this.#newEventButtonContainer);
+
     this.#renderBoard();
+  }
+
+  get events(){
+    this.#filterType = this.#filterModel.filter;
+    const events = this.#eventsModel.events;
+    const filteredEvents = filter[this.#filterType](events);
+
+    return sort[this.#currentSortType](filteredEvents);
   }
 
   #renderEvent(event){
@@ -47,7 +79,7 @@ export default class BoardPresenter {
       container: this.#eventListComponent.element,
       destinationsModel: this.#destinationsModel,
       offersModel: this.#offersModel,
-      onDataChange: this.#handleEventChange,
+      onDataChange: this.#handleViewAction,
       onModeChange: this.#handleModeChange
     });
 
@@ -57,36 +89,76 @@ export default class BoardPresenter {
   }
 
   #handleSortTypeChange = (sortType) => {
-    this.#sortEvents(sortType);
-    this.#clearEventList();
-    this.#renderSort(this.#container);
-    this.#renderEventList();
-  };
+    if (this.#currentSortType === sortType) {
+      return;
+    }
 
-  #handleEventChange = (updatedEvent) => {
-    this.#events = updateItem(this.#events, updatedEvent);
-    this.#eventPresenters.get(updatedEvent.id).init(updatedEvent);
-  };
-
-  #sortEvents(sortType){
     this.#currentSortType = sortType;
-    this.#events = sort[this.#currentSortType]([...this.#events]);
-  }
+
+    this.#clearBoard();
+    this.#renderBoard();
+  };
+
+  #handleViewAction = (actionType, updateType, update) => {
+    switch (actionType) {
+      case UserAction.UPDATE_EVENT:
+        this.#eventsModel.update(updateType, update);
+        break;
+      case UserAction.ADD_EVENT:
+        this.#eventsModel.add(updateType, update);
+        break;
+      case UserAction.DELETE_EVENT:
+        this.#eventsModel.delete(updateType,update);
+        break;
+    }
+  };
+
+  #handleModelEvent = (updateType, data) => {
+    switch (updateType) {
+      case UpdateType.PATCH:
+        this.#eventPresenters.get(data.id).init(data);
+        break;
+      case UpdateType.MINOR:
+        this.#clearBoard();
+        this.#renderBoard();
+        break;
+      case UpdateType.MAJOR:
+        this.#clearBoard({resetSortType: true});
+        this.#renderBoard();
+        break;
+    }
+  };
 
   #handleModeChange = () => {
+    this.#newEventPresenter.destroy();
     this.#eventPresenters.forEach((presenter) => presenter.resetView());
   };
 
   #clearEventList(){
+    this.#newEventPresenter.destroy();
     this.#eventPresenters.forEach((presenter) => presenter.destroy());
     this.#eventPresenters.clear();
+  }
+
+  #clearBoard({resetSortType = false} = {}){
+    this.#clearEventList();
+
+    remove(this.#sortComponent);
+
+    if(this.#eventEmptyComponent){
+      remove(this.#eventEmptyComponent);
+    }
+
+    if(resetSortType){
+      this.#currentSortType = SortType.DAY;
+    }
   }
 
   #renderSort() {
     const prevSortComponent = this.#sortComponent;
 
     this.#sortComponent = new SortView({
-      sortType: this.#currentSortType,
+      currentSortType: this.#currentSortType,
       onSortTypeChange: this.#handleSortTypeChange
     });
 
@@ -101,27 +173,52 @@ export default class BoardPresenter {
   }
 
   #renderEventEmpty(){
+    this.#eventEmptyComponent = new EventEmptyView({
+      filterType: this.#filterType
+    });
     render(this.#eventEmptyComponent, this.#container, RenderPosition.BEFOREEND);
   }
 
-  #renderEvents(){
-    this.#events.forEach((event) => this.#renderEvent(event));
+  #renderEvents(events){
+    events.forEach((event) => this.#renderEvent(event));
   }
 
   #renderEventList(){
     render(this.#eventListComponent, this.#container);
-
-    this.#renderEvents();
   }
 
   #renderBoard(){
 
-    if(this.#eventsModel.hasEvents()){
+    if(this.#eventsModel.hasEvents() && !this.#isCreating){
       this.#renderEventEmpty();
       return;
     }
 
     this.#renderSort();
     this.#renderEventList();
+    this.#renderEvents(this.events);
   }
+
+  createEvent(){
+    this.#currentSortType = SortType.DAY;
+    this.#filterModel.setFilter(UpdateType.MAJOR, FilterType.EVERYTHING);
+    this.#newEventPresenter.init();
+  }
+
+  #handleNewEventButtonClick = () => {
+    this.#isCreating = true;
+    this.createEvent();
+    this.#newEventButton.setDisabled(true);
+  };
+
+  #handleNewEventDestroy = () => {
+    this.#isCreating = false;
+    this.#newEventButton.setDisabled(false);
+
+    if(this.#eventsModel.hasEvents()){
+      remove(this.#sortComponent);
+      this.#sortComponent = null;
+      this.#renderEventEmpty();
+    }
+  };
 }

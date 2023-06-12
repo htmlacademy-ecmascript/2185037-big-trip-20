@@ -1,9 +1,13 @@
-export default class EventModel {
-  #events = null;
+import Observable from '../framework/observable.js';
+
+export default class EventModel extends Observable {
+  #events = [];
+  #service = null;
 
   constructor(service){
-    this.service = service;
-    this.#events = this.service.events;
+    super();
+    this.#service = service;
+    this.#events = this.#service.events;
   }
 
   get events(){
@@ -11,6 +15,35 @@ export default class EventModel {
   }
 
   hasEvents(){
-    return this.#events.length <= 1;
+    return this.#events.length < 1;
+  }
+
+  update(updateType, update){
+    const index = this.#events.findIndex((event) => event.id === update.id);
+
+    this.#events = [
+      ...this.#events.slice(0, index),
+      update,
+      ...this.#events.slice(index + 1)
+    ];
+    this._notify(updateType, update);
+  }
+
+  add(updateType, update){
+    this.#events = [
+      update,
+      ...this.#events
+    ];
+    this._notify(updateType, update);
+  }
+
+  delete(updateType, update){
+    const index = this.#events.findIndex((event) => event.id === update.id);
+
+    this.#events = [
+      ...this.#events.slice(0, index),
+      ...this.#events.slice(index + 1)
+    ];
+    this._notify(updateType, update);
   }
 }

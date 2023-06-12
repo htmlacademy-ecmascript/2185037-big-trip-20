@@ -63,6 +63,14 @@ function isEventPresent(event){
   return (dayjs().isAfter(event.dateFrom) && dayjs(event).isBefore(event.dateTo));
 }
 
+function isDatesEqual(dateA, dateB) {
+  return (dateA === null && dateB === null) || dayjs(dateA).isSame(dateB, 'D');
+}
+
+function isPricesEqual(priceA, priceB) {
+  return (priceA === null && priceB === null) || (priceA === priceB);
+}
+
 function getEventsDateDiff(eventA, eventB){
   return new Date(eventA.dateFrom) - new Date(eventB.dateFrom);
 }
@@ -90,5 +98,7 @@ export {
   isEventPresent,
   getEventsDateDiff,
   getEventsPriceDiff,
-  getEventsDurationDiff
+  getEventsDurationDiff,
+  isDatesEqual,
+  isPricesEqual
 };
