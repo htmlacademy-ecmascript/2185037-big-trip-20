@@ -50,7 +50,7 @@ export default class EventModel extends Observable {
   }
 
   hasEvents(){
-    return this.#events.length < 1;
+    return this.#events.length > 0;
   }
 
   async update(updateType, update){
