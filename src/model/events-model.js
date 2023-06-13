@@ -1,4 +1,5 @@
 import Observable from '../framework/observable.js';
+import { UpdateType } from '../const.js';
 
 export default class EventModel extends Observable {
   #events = [];
@@ -24,6 +25,8 @@ export default class EventModel extends Observable {
     } catch (error) {
       this.#events = [];
     }
+
+    this._notify(UpdateType.INIT);
   }
 
   #adaptToClient(event){
