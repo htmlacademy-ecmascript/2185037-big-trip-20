@@ -11,14 +11,19 @@ export default class EventModel extends Observable {
     this.#service = service;
     this.#destinationsModel = destinationsModel;
     this.#offersModel = offersModel;
-
-    this.#service.events.then((events) => {
-      console.log(events.map(this.#adaptToClient));
-    });
   }
 
   get events(){
     return this.#events;
+  }
+
+  async init(){
+    try {
+      const events = await this.#service.events;
+      this.#events = events.map(this.#adaptToClient);
+    } catch (error) {
+      this.#events = [];
+    }
   }
 
   #adaptToClient(event){

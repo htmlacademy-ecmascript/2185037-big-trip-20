@@ -6,7 +6,6 @@ import DestinationModel from './model/destinations-model.js';
 import OfferModel from './model/offers-model.js';
 import FilterModel from './model/filter-model.js';
 
-import MockService from './service/mock-service.js';
 import EventsApiService from './service/events-api-service.js';
 
 const AUTHORIZATION = EventsApiService.getStringBasicAuth();
@@ -18,7 +17,6 @@ const siteFiltersElement = siteHeaderElement.querySelector('.trip-controls__filt
 const siteNewEventContainer = siteHeaderElement.querySelector('.trip-main');
 const siteBoardElement = siteMainElement.querySelector('.trip-events');
 
-// const mockService = new MockService();
 const eventsApiService = new EventsApiService(END_POINT, AUTHORIZATION);
 const destinationsModel = new DestinationModel(eventsApiService);
 const offersModel = new OfferModel(eventsApiService);
@@ -47,3 +45,4 @@ const boardPresenter = new BoardPresenter({
 
 filterPresenter.init();
 boardPresenter.init();
+eventsModel.init();
