@@ -205,13 +205,13 @@ export default class BoardPresenter {
 
   #renderBoard(){
 
-    if(this.#eventsModel.hasEvents() && !this.#isCreating){
-      this.#renderEventEmpty();
+    if(this.#isLoading){
+      this.#renderLoading();
       return;
     }
 
-    if(this.#isLoading){
-      this.#renderLoading();
+    if(!this.#eventsModel.hasEvents() && !this.#isCreating){
+      this.#renderEventEmpty();
       return;
     }
 
@@ -236,7 +236,7 @@ export default class BoardPresenter {
     this.#isCreating = false;
     this.#newEventButton.setDisabled(false);
 
-    if(this.#eventsModel.hasEvents()){
+    if(!this.#eventsModel.hasEvents()){
       remove(this.#sortComponent);
       this.#sortComponent = null;
       this.#renderEventEmpty();
