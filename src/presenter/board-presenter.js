@@ -5,6 +5,7 @@ import EventEmptyView from '../view/event-list-empty-view.js';
 import EventPresenter from './event-presenter.js';
 import NewEventPresenter from './new-event-presenter.js';
 import NewEventButtonView from '../view/new-event-button-view.js';
+import LoadingView from '../view/loading-view.js';
 
 import { sort } from '../utils/sort.js';
 import { SortType, UpdateType, UserAction, FilterType } from '../const.js';
@@ -12,6 +13,7 @@ import { filter } from '../utils/filter.js';
 
 export default class BoardPresenter {
   #eventListComponent = new EventListView();
+  #loadingComponent = new LoadingView();
   #sortComponent = null;
   #eventEmptyComponent = null;
   #newEventButton = null;
@@ -29,6 +31,7 @@ export default class BoardPresenter {
   #currentSortType = SortType.DAY;
   #filterType = FilterType.EVERYTHING;
   #isCreating = false;
+  #isLoading = true;
 
   constructor({
     container,
@@ -126,8 +129,17 @@ export default class BoardPresenter {
         this.#clearBoard({resetSortType: true});
         this.#renderBoard();
         break;
+      case UpdateType.INIT:
+        this.#isLoading = false;
+        remove(this.#loadingComponent);
+        this.#renderBoard();
+        break;
     }
   };
+
+  #renderLoading(){
+    render(this.#loadingComponent, this.#container, RenderPosition.BEFOREEND);
+  }
 
   #handleModeChange = () => {
     this.#newEventPresenter.destroy();
@@ -191,6 +203,11 @@ export default class BoardPresenter {
 
     if(this.#eventsModel.hasEvents() && !this.#isCreating){
       this.#renderEventEmpty();
+      return;
+    }
+
+    if(this.#isLoading){
+      this.#renderLoading();
       return;
     }
 
