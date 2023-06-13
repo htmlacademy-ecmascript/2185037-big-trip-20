@@ -1,8 +1,15 @@
-import ApiService from './framework/api-service.js';
+import ApiService from '../framework/api-service.js';
+import { Buffer } from 'buffer';
+
 
 const Method = {
   GET: 'GET',
   PUT: 'PUT'
+};
+
+const DATA_AUTH = {
+  USERNAME: 'Anatoly',
+  PASSWORD: 'qwerty'
 };
 
 export default class EventsApiService extends ApiService {
@@ -19,6 +26,10 @@ export default class EventsApiService extends ApiService {
   get offers(){
     return this._load({url: 'offers'})
       .then(ApiService.parseResponse);
+  }
+
+  static getStringBasicAuth(){
+    return `Basic ${Buffer.from(`${DATA_AUTH.USERNAME}:${DATA_AUTH.PASSWORD}`).toString('base64')}`;
   }
 
   async updateEvent(event){

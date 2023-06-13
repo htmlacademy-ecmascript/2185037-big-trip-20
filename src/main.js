@@ -7,6 +7,10 @@ import OfferModel from './model/offers-model.js';
 import FilterModel from './model/filter-model.js';
 
 import MockService from './service/mock-service.js';
+import EventsApiService from './service/events-api-service.js';
+
+const AUTHORIZATION = EventsApiService.getStringBasicAuth();
+const END_POINT = 'https://20.ecmascript.pages.academy/big-trip';
 
 const siteMainElement = document.querySelector('main');
 const siteHeaderElement = document.querySelector('header');
@@ -14,10 +18,16 @@ const siteFiltersElement = siteHeaderElement.querySelector('.trip-controls__filt
 const siteNewEventContainer = siteHeaderElement.querySelector('.trip-main');
 const siteBoardElement = siteMainElement.querySelector('.trip-events');
 
-const mockService = new MockService();
-const destinationsModel = new DestinationModel(mockService);
-const offersModel = new OfferModel(mockService);
-const eventsModel = new EventModel(mockService);
+// const mockService = new MockService();
+const eventsApiService = new EventsApiService(END_POINT, AUTHORIZATION);
+const destinationsModel = new DestinationModel(eventsApiService);
+const offersModel = new OfferModel(eventsApiService);
+const eventsModel = new EventModel({
+  service: eventsApiService,
+  destinationsModel,
+  offersModel
+});
+
 const filterModel = new FilterModel();
 
 const filterPresenter = new FilterPresenter({

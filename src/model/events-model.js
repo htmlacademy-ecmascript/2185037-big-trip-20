@@ -3,11 +3,19 @@ import Observable from '../framework/observable.js';
 export default class EventModel extends Observable {
   #events = [];
   #service = null;
+  #destinationsModel = null;
+  #offersModel = null;
 
-  constructor(service){
+  constructor({service, destinationsModel, offersModel}){
     super();
     this.#service = service;
-    this.#events = this.#service.events;
+    this.#destinationsModel = destinationsModel;
+    this.#offersModel = offersModel;
+    // this.#events = this.#service.events;
+
+    this.#service.events.then((events) => {
+      console.log(events);
+    });
   }
 
   get events(){
