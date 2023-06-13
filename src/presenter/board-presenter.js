@@ -161,6 +161,10 @@ export default class BoardPresenter {
       remove(this.#eventEmptyComponent);
     }
 
+    if(this.#loadingComponent){
+      remove(this.#loadingComponent);
+    }
+
     if(resetSortType){
       this.#currentSortType = SortType.DAY;
     }
