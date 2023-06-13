@@ -46,4 +46,20 @@ export default class EventsApiService extends ApiService {
 
     return parsedResponse;
   }
+
+  #adaptToServer(event){
+    const adaptedEvent = {...event,
+      'base_price':  event.basePrice,
+      'date_from': event.dateFrom,
+      'date_to': event.dateTo,
+      'is_favorite':  event.isFavorite
+    };
+
+    delete adaptedEvent.basePrice;
+    delete adaptedEvent.dateFrom;
+    delete adaptedEvent.dateTo;
+    delete adaptedEvent.isFavorite;
+
+    return adaptedEvent;
+  }
 }
