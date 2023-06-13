@@ -36,7 +36,7 @@ export default class EventsApiService extends ApiService {
     const response = await this._load({
       url: `points/${event.id}`,
       method: Method.PUT,
-      body: JSON.stringify(event),
+      body: JSON.stringify(this.#adaptToServer(event)),
       headers: new Headers({
         'Content-Type': 'application/json'
       })
