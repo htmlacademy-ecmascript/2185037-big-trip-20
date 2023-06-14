@@ -1,9 +1,14 @@
 export default class OfferModel {
   #offers = null;
+  #service = null;
 
   constructor(service){
-    this.service = service;
-    this.#offers = this.service.offers;
+    this.#service = service;
+  }
+
+  async init(){
+    this.#offers = await this.#service.offers;
+    return this.#offers;
   }
 
   get offers(){
