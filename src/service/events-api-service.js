@@ -4,7 +4,9 @@ import { Buffer } from 'buffer';
 
 const Method = {
   GET: 'GET',
-  PUT: 'PUT'
+  PUT: 'PUT',
+  POST: 'POST',
+  DELETE: 'DELETE'
 };
 
 const DATA_AUTH = {
@@ -45,6 +47,30 @@ export default class EventsApiService extends ApiService {
     const parsedResponse = await ApiService.parseResponse(response);
 
     return parsedResponse;
+  }
+
+  async addEvent(event){
+    const response = await this._load({
+      url: 'points',
+      method: Method.POST,
+      body: JSON.stringify(this.#adaptToServer(event)),
+      headers: new Headers({
+        'Content-Type': 'application/json'
+      })
+    });
+
+    const parsedResponse = await ApiService.parseResponse(response);
+
+    return parsedResponse;
+  }
+
+  async deleteEvent(event){
+    const response = await this._load({
+      url: `points/${event.id}`,
+      method: Method.DELETE
+    });
+
+    return response;
   }
 
   #adaptToServer(event){
