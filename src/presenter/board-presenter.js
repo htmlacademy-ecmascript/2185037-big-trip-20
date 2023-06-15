@@ -119,7 +119,7 @@ export default class BoardPresenter {
       case UserAction.UPDATE_EVENT:
         this.#eventPresenters.get(update.id).setSaving();
         try {
-          this.#eventsModel.update(updateType, update);
+          await this.#eventsModel.update(updateType, update);
         } catch (error) {
           this.#eventPresenters.get(update.id).setAborting();
         }
@@ -127,7 +127,7 @@ export default class BoardPresenter {
       case UserAction.ADD_EVENT:
         this.#newEventPresenter.setSaving();
         try {
-          this.#eventsModel.add(updateType, update);
+          await this.#eventsModel.add(updateType, update);
         } catch (error) {
           this.#newEventPresenter.setAborting();
         }
@@ -135,7 +135,7 @@ export default class BoardPresenter {
       case UserAction.DELETE_EVENT:
         this.#eventPresenters.get(update.id).setDeleting();
         try {
-          this.#eventsModel.delete(updateType,update);
+          await this.#eventsModel.delete(updateType,update);
         } catch (error) {
           this.#eventPresenters.get(update.id).setAborting();
         }
