@@ -1,4 +1,5 @@
 import { remove, render, RenderPosition, replace } from '../framework/render.js';
+import UiBlocker from '../framework/ui-blocker/ui-blocker.js';
 import EventListView from '../view/event-list-view.js';
 import SortView from '../view/sort-view.js';
 import EventEmptyView from '../view/event-list-empty-view.js';
@@ -10,6 +11,11 @@ import LoadingView from '../view/loading-view.js';
 import { sort } from '../utils/sort.js';
 import { SortType, UpdateType, UserAction, FilterType } from '../const.js';
 import { filter } from '../utils/filter.js';
+
+const TimeLimit = {
+  LOWER_LIMIT: 350,
+  UPPER_LIMIT: 1000
+};
 
 export default class BoardPresenter {
   #eventListComponent = new EventListView();
@@ -32,6 +38,10 @@ export default class BoardPresenter {
   #filterType = FilterType.EVERYTHING;
   #isCreating = false;
   #isLoading = true;
+  #uiBlocker = new UiBlocker({
+    lowerLimit: TimeLimit.LOWER_LIMIT,
+    upperLimit: TimeLimit.UPPER_LIMIT
+  });
 
   constructor({
     container,
@@ -103,6 +113,8 @@ export default class BoardPresenter {
   };
 
   #handleViewAction = async (actionType, updateType, update) => {
+    this.#uiBlocker.block();
+
     switch (actionType) {
       case UserAction.UPDATE_EVENT:
         this.#eventPresenters.get(update.id).setSaving();
@@ -129,6 +141,8 @@ export default class BoardPresenter {
         }
         break;
     }
+
+    this.#uiBlocker.unblock();
   };
 
   #handleModelEvent = (updateType, data) => {
