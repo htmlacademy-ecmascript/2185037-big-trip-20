@@ -12,7 +12,7 @@ const ButtonLabel = {
   [EditType.EDITING]: 'Delete'
 };
 
-function createTypeList(typeEvent){
+function createTypeList(typeEvent, isDisabled){
   return (
     `<div class="event__type-list">
       <fieldset class="event__type-group">
@@ -25,6 +25,7 @@ function createTypeList(typeEvent){
               type="radio"
               name="event-type"
               value="${type}"
+              ${isDisabled ? 'disabled' : ''}
               ${typeEvent === type ? 'checked' : ''}>
             <label class="event__type-label  event__type-label--${type}" for="event-type-${type}-1">${type}</label>
           </div>`
@@ -34,7 +35,7 @@ function createTypeList(typeEvent){
   );
 }
 
-function createDestinationList(event, destinations, type){
+function createDestinationList(event, destinations, type, isDisabled){
   const destination = destinations.find((item) => item.id === event.destination);
   return (
     `<div class="event__field-group  event__field-group--destination">
@@ -46,6 +47,7 @@ function createDestinationList(event, destinations, type){
         id="event-destination-1"
         type="text"
         name="event-destination"
+        ${isDisabled ? 'disabled' : ''}
         value="${destination ? destination.name : ''}" list="destination-list-1">
       <datalist id="destination-list-1">
       ${destinations.map((item) => (
@@ -56,7 +58,7 @@ function createDestinationList(event, destinations, type){
   );
 }
 
-function createOffersList(event, offers){
+function createOffersList(event, offers, isDisabled){
   const offersByType = offers.find((offer) => offer.type === event.type)?.offers;
   if(offersByType === undefined){
     return;
@@ -78,6 +80,7 @@ function createOffersList(event, offers){
           id="event-offer-${id}"
           type="checkbox"
           name="event-offer-${id}"
+          ${isDisabled ? 'disabled' : ''}
           ${ offersByIds.find((offer) => id === offer.id) ? 'checked' : ''}
         >
         <label class="event__offer-label" for="event-offer-${id}">
@@ -104,7 +107,7 @@ function createPhotosList(pictures){
 }
 
 function createEventEditTemplate({state, destinations, offers, editType}){
-  const {event} = state;
+  const {event, isDeleting, isDisabled, isSaving} = state;
   const {basePrice, dateFrom, dateTo, type} = event;
 
   const destination = destinations.find((item) => item.id === event.destination);
@@ -120,17 +123,29 @@ function createEventEditTemplate({state, destinations, offers, editType}){
             </label>
             <input class="event__type-toggle  visually-hidden" id="event-type-toggle-1" type="checkbox">
 
-            ${createTypeList(type, offers)}
+            ${createTypeList(type, offers, isDisabled)}
           </div>
 
-          ${createDestinationList(event, destinations, type)}
+          ${createDestinationList(event, destinations, type, isDisabled)}
 
           <div class="event__field-group  event__field-group--time">
             <label class="visually-hidden" for="event-start-time-1">From</label>
-            <input class="event__input  event__input--time" id="event-start-time-1" type="text" name="event-start-time" value="${humanizeEventDateForm(dateFrom)}">
+            <input
+              class="event__input  event__input--time"
+              id="event-start-time-1"
+              type="text"
+              name="event-start-time"
+              ${isDisabled ? 'disabled' : ''}
+              value="${humanizeEventDateForm(dateFrom)}">
             &mdash;
             <label class="visually-hidden" for="event-end-time-1">To</label>
-            <input class="event__input  event__input--time" id="event-end-time-1" type="text" name="event-end-time" value="${humanizeEventDateForm(dateTo)}">
+            <input
+              class="event__input  event__input--time"
+              id="event-end-time-1"
+              type="text"
+              name="event-end-time"
+              ${isDisabled ? 'disabled' : ''}
+              value="${humanizeEventDateForm(dateTo)}">
           </div>
 
           <div class="event__field-group  event__field-group--price">
@@ -138,21 +153,31 @@ function createEventEditTemplate({state, destinations, offers, editType}){
               <span class="visually-hidden">Price</span>
               &euro;
             </label>
-            <input class="event__input  event__input--price" id="event-price-1" type="text" name="event-price" value="${he.encode(basePrice.toString())}">
+            <input
+              class="event__input  event__input--price"
+              id="event-price-1"
+              type="text"
+              name="event-price"
+              ${isDisabled ? 'disabled' : ''}
+              value="${he.encode(basePrice.toString())}">
           </div>
 
-          <button class="event__save-btn  btn  btn--blue" type="submit">Save</button>
-          <button class="event__reset-btn" type="reset">${ButtonLabel[editType]}</button>
+          <button class="event__save-btn  btn  btn--blue" type="submit" ${isDisabled ? 'disabled' : ''}>
+            ${isSaving ? 'Saving...' : 'Save'}
+          </button>
+          <button class="event__reset-btn" type="reset" ${isDisabled ? 'disabled' : ''}>
+            ${ isDeleting ? 'Deleting...' : ButtonLabel[editType]}
+          </button>
           ${editType !== EditType.CREATING ? '<button class="event__rollup-btn" type="button"><span class="visually-hidden">Open event</span></button>' : ''}
 
         </header>
         <section class="event__details">
-          ${createOffersList(event, offers)}
+          ${createOffersList(event, offers, isDisabled)}
           <section class="event__section  event__section--destination">
             <h3 class="event__section-title  event__section-title--destination">Destination</h3>
             <p class="event__destination-description">${ destination ? destination.description : '' }.</p>
             <div class="event__photos-container">
-              ${createPhotosList(destination ? destination.pictures : '')}
+              ${createPhotosList(destination ? destination.pictures : '', isDisabled)}
             </div>
           </section>
         </section>
@@ -353,7 +378,20 @@ export default class EventEditView extends AbstractStatefulView {
     });
   };
 
-  static parseEventToState = ({event}) => ({event});
+  static parseEventToState = ({event}) => ({
+    event,
+    isDisabled: false,
+    isSaving: false,
+    isDeleting: false
+  });
 
-  static parseStateToEvent = (state) => state.event;
+  static parseStateToEvent = (state) => {
+    const {event} = state;
+
+    delete event.isDeleting;
+    delete event.isDisabled;
+    delete event.isSaving;
+
+    return event;
+  };
 }
