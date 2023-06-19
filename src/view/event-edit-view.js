@@ -97,7 +97,7 @@ function createOffersList(event, offers, isDisabled){
 
 function createPhotosList(pictures){
   if(!pictures){
-    return;
+    return '';
   }
   return (
     `<div class="event__photos-tape">
@@ -175,9 +175,9 @@ function createEventEditTemplate({state, destinations, offers, editType}){
           ${createOffersList(event, offers, isDisabled)}
           <section class="event__section  event__section--destination">
             <h3 class="event__section-title  event__section-title--destination">Destination</h3>
-            <p class="event__destination-description">${ destination ? destination.description : '' }.</p>
+            <p class="event__destination-description">${ destination?.description ?? '' }</p>
             <div class="event__photos-container">
-              ${createPhotosList(destination ? destination.pictures : '', isDisabled)}
+              ${createPhotosList(destination?.pictures ?? false)}
             </div>
           </section>
         </section>
