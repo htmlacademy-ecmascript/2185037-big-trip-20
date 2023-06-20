@@ -30,10 +30,6 @@ export default class EventsApiService extends ApiService {
       .then(ApiService.parseResponse);
   }
 
-  static getStringBasicAuth(){
-    return `Basic ${Buffer.from(`${DATA_AUTH.USERNAME}:${DATA_AUTH.PASSWORD}`).toString('base64')}`;
-  }
-
   async updateEvent(event){
     const response = await this._load({
       url: `points/${event.id}`,
@@ -87,5 +83,9 @@ export default class EventsApiService extends ApiService {
     delete adaptedEvent.isFavorite;
 
     return adaptedEvent;
+  }
+
+  static getStringBasicAuth(){
+    return `Basic ${Buffer.from(`${DATA_AUTH.USERNAME}:${DATA_AUTH.PASSWORD}`).toString('base64')}`;
   }
 }

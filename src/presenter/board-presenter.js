@@ -62,21 +62,12 @@ export default class BoardPresenter {
       eventListContainer: this.#eventListComponent.element,
       destinationsModel: this.#destinationsModel,
       offersModel: this.#offersModel,
-      onDataChange: this.#handleViewAction,
-      onDestroy: this.#handleNewEventDestroy
+      onDataChange: this.#viewActionHandler,
+      onDestroy: this.#newEventDestroyHandler
     });
 
-    this.#eventsModel.addObserver(this.#handleModelEvent);
-    this.#filterModel.addObserver(this.#handleModelEvent);
-  }
-
-  init(){
-    this.#newEventButton = new NewEventButtonView({
-      onClick: this.#handleNewEventButtonClick
-    });
-    render(this.#newEventButton, this.#newEventButtonContainer);
-
-    this.#renderBoard();
+    this.#eventsModel.addObserver(this.#modelEventHandler);
+    this.#filterModel.addObserver(this.#modelEventHandler);
   }
 
   get events(){
@@ -87,13 +78,22 @@ export default class BoardPresenter {
     return sort[this.#currentSortType](filteredEvents);
   }
 
+  init(){
+    this.#newEventButton = new NewEventButtonView({
+      onClick: this.#newEventButtonClickHandler
+    });
+    render(this.#newEventButton, this.#newEventButtonContainer);
+
+    this.#renderBoard();
+  }
+
   #renderEvent(event){
     const eventPresenter = new EventPresenter({
       container: this.#eventListComponent.element,
       destinationsModel: this.#destinationsModel,
       offersModel: this.#offersModel,
-      onDataChange: this.#handleViewAction,
-      onModeChange: this.#handleModeChange
+      onDataChange: this.#viewActionHandler,
+      onModeChange: this.#modeChangeHandler
     });
 
     eventPresenter.init(event);
@@ -101,79 +101,9 @@ export default class BoardPresenter {
     this.#eventPresenters.set(event.id, eventPresenter);
   }
 
-  #handleSortTypeChange = (sortType) => {
-    if (this.#currentSortType === sortType) {
-      return;
-    }
-
-    this.#currentSortType = sortType;
-
-    this.#clearBoard();
-    this.#renderBoard();
-  };
-
-  #handleViewAction = async (actionType, updateType, update) => {
-    this.#uiBlocker.block();
-
-    switch (actionType) {
-      case UserAction.UPDATE_EVENT:
-        this.#eventPresenters.get(update.id).setSaving();
-        try {
-          await this.#eventsModel.update(updateType, update);
-        } catch (error) {
-          this.#eventPresenters.get(update.id).setAborting();
-        }
-        break;
-      case UserAction.ADD_EVENT:
-        this.#newEventPresenter.setSaving();
-        try {
-          await this.#eventsModel.add(updateType, update);
-        } catch (error) {
-          this.#newEventPresenter.setAborting();
-        }
-        break;
-      case UserAction.DELETE_EVENT:
-        this.#eventPresenters.get(update.id).setDeleting();
-        try {
-          await this.#eventsModel.delete(updateType,update);
-        } catch (error) {
-          this.#eventPresenters.get(update.id).setAborting();
-        }
-        break;
-    }
-
-    this.#uiBlocker.unblock();
-  };
-
-  #handleModelEvent = (updateType, data) => {
-    switch (updateType) {
-      case UpdateType.PATCH:
-        this.#eventPresenters.get(data.id).init(data);
-        break;
-      case UpdateType.MINOR:
-        this.#clearBoard();
-        this.#renderBoard();
-        break;
-      case UpdateType.MAJOR:
-        this.#clearBoard({resetSortType: true});
-        this.#renderBoard();
-        break;
-      case UpdateType.INIT:
-        this.#isLoading = false;
-        remove(this.#loadingComponent);
-        this.#renderBoard();
-        break;
-    }
-  };
-
   #renderLoading(){
     render(this.#loadingComponent, this.#container, RenderPosition.BEFOREEND);
   }
-
-  #handleModeChange = () => {
-    this.#newEventPresenter.destroy();
-    this.#eventPresenters.forEach((presenter) => presenter.resetView());
-  };
 
   #clearEventList(){
     this.#newEventPresenter.destroy();
@@ -204,7 +134,7 @@ export default class BoardPresenter {
 
     this.#sortComponent = new SortView({
       currentSortType: this.#currentSortType,
-      onSortTypeChange: this.#handleSortTypeChange
+      onSortTypeChange: this.#sortTypeChangeHandler
     });
 
     if(prevSortComponent){
@@ -255,13 +185,83 @@ export default class BoardPresenter {
     this.#newEventPresenter.init();
   }
 
-  #handleNewEventButtonClick = () => {
+  #sortTypeChangeHandler = (sortType) => {
+    if (this.#currentSortType === sortType) {
+      return;
+    }
+
+    this.#currentSortType = sortType;
+
+    this.#clearBoard();
+    this.#renderBoard();
+  };
+
+  #viewActionHandler = async (actionType, updateType, update) => {
+    this.#uiBlocker.block();
+
+    switch (actionType) {
+      case UserAction.UPDATE_EVENT:
+        this.#eventPresenters.get(update.id).setSaving();
+        try {
+          await this.#eventsModel.update(updateType, update);
+        } catch (error) {
+          this.#eventPresenters.get(update.id).setAborting();
+        }
+        break;
+      case UserAction.ADD_EVENT:
+        this.#newEventPresenter.setSaving();
+        try {
+          await this.#eventsModel.add(updateType, update);
+        } catch (error) {
+          this.#newEventPresenter.setAborting();
+        }
+        break;
+      case UserAction.DELETE_EVENT:
+        this.#eventPresenters.get(update.id).setDeleting();
+        try {
+          await this.#eventsModel.delete(updateType,update);
+        } catch (error) {
+          this.#eventPresenters.get(update.id).setAborting();
+        }
+        break;
+    }
+
+    this.#uiBlocker.unblock();
+  };
+
+  #modelEventHandler = (updateType, data) => {
+    switch (updateType) {
+      case UpdateType.PATCH:
+        this.#eventPresenters.get(data.id).init(data);
+        break;
+      case UpdateType.MINOR:
+        this.#clearBoard();
+        this.#renderBoard();
+        break;
+      case UpdateType.MAJOR:
+        this.#clearBoard({resetSortType: true});
+        this.#renderBoard();
+        break;
+      case UpdateType.INIT:
+        this.#isLoading = false;
+        remove(this.#loadingComponent);
+        this.#renderBoard();
+        break;
+    }
+  };
+
+  #modeChangeHandler = () => {
+    this.#newEventPresenter.destroy();
+    this.#eventPresenters.forEach((presenter) => presenter.resetView());
+  };
+
+  #newEventButtonClickHandler = () => {
     this.#isCreating = true;
     this.createEvent();
     this.#newEventButton.setDisabled(true);
   };
 
-  #handleNewEventDestroy = () => {
+  #newEventDestroyHandler = () => {
     this.#isCreating = false;
     this.#newEventButton.setDisabled(false);
 

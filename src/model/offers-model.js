@@ -6,12 +6,12 @@ export default class OfferModel {
     this.#service = service;
   }
 
-  async init(){
-    this.#offers = await this.#service.offers;
+  get offers(){
     return this.#offers;
   }
 
-  get offers(){
+  async init(){
+    this.#offers = await this.#service.offers;
     return this.#offers;
   }
 

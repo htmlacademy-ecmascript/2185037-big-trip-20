@@ -5,12 +5,12 @@ function createNewEventButtonTemplate() {
 }
 
 export default class NewEventButtonView extends AbstractStatefulView {
-  #handleClick = null;
+  #onClick = null;
 
   constructor({onClick}) {
     super();
 
-    this.#handleClick = onClick;
+    this.#onClick = onClick;
     this.element.addEventListener('click', this.#clickHandler);
   }
 
@@ -18,12 +18,12 @@ export default class NewEventButtonView extends AbstractStatefulView {
     return createNewEventButtonTemplate();
   }
 
-  #clickHandler = (evt) => {
-    evt.preventDefault();
-    this.#handleClick();
-  };
-
   setDisabled(bool){
     this.element.disabled = bool;
   }
+
+  #clickHandler = (evt) => {
+    evt.preventDefault();
+    this.#onClick();
+  };
 }

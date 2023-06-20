@@ -12,7 +12,7 @@ const ButtonLabel = {
   [EditType.EDITING]: 'Delete'
 };
 
-function createTypeList(typeEvent, isDisabled){
+function createTypeList(typeEvent){
   return (
     `<div class="event__type-list">
       <fieldset class="event__type-group">
@@ -25,7 +25,6 @@ function createTypeList(typeEvent, isDisabled){
               type="radio"
               name="event-type"
               value="${type}"
-              ${isDisabled ? 'disabled' : ''}
               ${typeEvent === type ? 'checked' : ''}>
             <label class="event__type-label  event__type-label--${type}" for="event-type-${type}-1">${type}</label>
           </div>`
@@ -123,7 +122,7 @@ function createEventEditTemplate({state, destinations, offers, editType}){
             </label>
             <input class="event__type-toggle  visually-hidden" id="event-type-toggle-1" type="checkbox">
 
-            ${createTypeList(type, offers, isDisabled)}
+            ${createTypeList(type)}
           </div>
 
           ${createDestinationList(event, destinations, type, isDisabled)}
@@ -190,9 +189,9 @@ export default class EventEditView extends AbstractStatefulView {
 
   #destinations = null;
   #offers = null;
-  #handleFormSubmit = null;
-  #handleFormReset = null;
-  #handleDeleteClick = null;
+  #onFormSubmit = null;
+  #onResetClick = null;
+  #onDeleteClick = null;
 
   #datepickerFrom = null;
   #datepickerTo = null;
@@ -206,9 +205,9 @@ export default class EventEditView extends AbstractStatefulView {
 
     this.#destinations = destinations;
     this.#offers = offers;
-    this.#handleFormSubmit = onFormSubmit;
-    this.#handleFormReset = onResetClick;
-    this.#handleDeleteClick = onDeleteClick;
+    this.#onFormSubmit = onFormSubmit;
+    this.#onResetClick = onResetClick;
+    this.#onDeleteClick = onDeleteClick;
     this.#type = type;
 
     this._restoreHandlers();
@@ -232,10 +231,10 @@ export default class EventEditView extends AbstractStatefulView {
 
     this.element.querySelector('form').addEventListener('submit', this.#formSubmitHandler);
     this.element.querySelectorAll('.event__type-input').forEach((element) => {
-      element.addEventListener('change', this.#typeInputClick);
+      element.addEventListener('change', this.#typeInputClickHandler);
     });
-    this.element.querySelector('.event__input--price').addEventListener('change', this.#priceInputChange);
-    this.element.querySelector('.event__input--destination').addEventListener('change', this.#destinationInputChange);
+    this.element.querySelector('.event__input--price').addEventListener('change', this.#priceInputChangeHandler);
+    this.element.querySelector('.event__input--destination').addEventListener('change', this.#destinationInputChangeHandler);
     this.element.querySelector('.event__reset-btn').addEventListener('click', this.#deleteButtonClickHanlder);
 
     const offerBlock = this.element.querySelector('.event__available-offers');
@@ -278,6 +277,20 @@ export default class EventEditView extends AbstractStatefulView {
     );
   };
 
+  removeElement = () => {
+    super.removeElement();
+
+    if(this.#datepickerFrom){
+      this.#datepickerFrom.destroy();
+      this.#datepickerFrom = null;
+    }
+
+    if(this.#datepickerTo){
+      this.#datepickerTo.destroy();
+      this.#datepickerTo = null;
+    }
+  };
+
   #dateFromChangeHandler = ([userDate]) => {
     this._setState({
       event: {
@@ -298,36 +311,22 @@ export default class EventEditView extends AbstractStatefulView {
     this.#datepickerFrom.set('maxDate', this._state.event.dateTo);
   };
 
-  removeElement = () => {
-    super.removeElement();
-
-    if(this.#datepickerFrom){
-      this.#datepickerFrom.destroy();
-      this.#datepickerFrom = null;
-    }
-
-    if(this.#datepickerTo){
-      this.#datepickerTo.destroy();
-      this.#datepickerTo = null;
-    }
-  };
-
   #formSubmitHandler = (evt) => {
     evt.preventDefault();
-    this.#handleFormSubmit(EventEditView.parseStateToEvent(this._state));
+    this.#onFormSubmit(EventEditView.parseStateToEvent(this._state));
   };
 
   #deleteButtonClickHanlder = (evt) => {
     evt.preventDefault();
-    this.#handleDeleteClick(EventEditView.parseStateToEvent(this._state));
+    this.#onDeleteClick(EventEditView.parseStateToEvent(this._state));
   };
 
   #resetButtonClickHandler = (evt) => {
     evt.preventDefault();
-    this.#handleFormReset();
+    this.#onResetClick();
   };
 
-  #typeInputClick = (evt) => {
+  #typeInputClickHandler = (evt) => {
     evt.preventDefault();
 
     this.updateElement({
@@ -352,7 +351,7 @@ export default class EventEditView extends AbstractStatefulView {
     });
   };
 
-  #priceInputChange = (evt) => {
+  #priceInputChangeHandler = (evt) => {
     evt.preventDefault();
 
     this._setState({
@@ -363,7 +362,7 @@ export default class EventEditView extends AbstractStatefulView {
     });
   };
 
-  #destinationInputChange = (evt) => {
+  #destinationInputChangeHandler = (evt) => {
     evt.preventDefault();
 
     const selectedDestination = this.#destinations.find((destination) => destination.name === evt.target.value);
