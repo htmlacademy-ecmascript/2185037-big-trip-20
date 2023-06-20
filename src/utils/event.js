@@ -13,10 +13,6 @@ const DAY_DURATION_FORMAT = 'D[D] HH[H] m[M]';
 const HOUR_DURATION_FORMAT = 'HH[H] m[M]';
 const MINUTE_DURATION_FORMAT = 'm[M]';
 
-function getRandomArrayElement(items) {
-  return items[Math.floor(Math.random() * items.length)];
-}
-
 function humanizeEventDate(date) {
   return date ? dayjs(date).format(DATE_FORMAT) : '';
 }
@@ -85,8 +81,15 @@ function getEventsPriceDiff(eventA, eventB){
   return eventB.basePrice - eventA.basePrice;
 }
 
+function escKeyDownHandler(evt, cb, handler){
+  if (evt.key === 'Escape' || evt.key === 'Esc') {
+    evt.preventDefault();
+    cb();
+    document.removeEventListener('keydown', handler);
+  }
+}
+
 export {
-  getRandomArrayElement,
   humanizeEventDateShedule,
   humanizeEventDateForm,
   humanizeEventDate,
@@ -100,5 +103,6 @@ export {
   getEventsPriceDiff,
   getEventsDurationDiff,
   isDatesEqual,
-  isPricesEqual
+  isPricesEqual,
+  escKeyDownHandler
 };
