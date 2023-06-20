@@ -12,7 +12,7 @@ const ButtonLabel = {
   [EditType.EDITING]: 'Delete'
 };
 
-function createTypeList(typeEvent, isDisabled){
+function createTypeList(typeEvent){
   return (
     `<div class="event__type-list">
       <fieldset class="event__type-group">
@@ -25,7 +25,6 @@ function createTypeList(typeEvent, isDisabled){
               type="radio"
               name="event-type"
               value="${type}"
-              ${isDisabled ? 'disabled' : ''}
               ${typeEvent === type ? 'checked' : ''}>
             <label class="event__type-label  event__type-label--${type}" for="event-type-${type}-1">${type}</label>
           </div>`
@@ -123,7 +122,7 @@ function createEventEditTemplate({state, destinations, offers, editType}){
             </label>
             <input class="event__type-toggle  visually-hidden" id="event-type-toggle-1" type="checkbox">
 
-            ${createTypeList(type, offers, isDisabled)}
+            ${createTypeList(type)}
           </div>
 
           ${createDestinationList(event, destinations, type, isDisabled)}
