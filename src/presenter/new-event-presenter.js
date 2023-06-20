@@ -4,8 +4,8 @@ import { UserAction, UpdateType, EditType } from '../const.js';
 
 export default class NewEventPresenter {
   #eventListContainer = null;
-  #handleDataChange = null;
-  #handleDestroy = null;
+  #onDataChange = null;
+  #onDestroy = null;
   #offersModel = null;
   #destinationsModel = null;
 
@@ -15,8 +15,8 @@ export default class NewEventPresenter {
     this.#eventListContainer = eventListContainer;
     this.#destinationsModel = destinationsModel;
     this.#offersModel = offersModel;
-    this.#handleDataChange = onDataChange;
-    this.#handleDestroy = onDestroy;
+    this.#onDataChange = onDataChange;
+    this.#onDestroy = onDestroy;
   }
 
   init(){
@@ -42,7 +42,7 @@ export default class NewEventPresenter {
       return;
     }
 
-    this.#handleDestroy();
+    this.#onDestroy();
 
     remove(this.#eventEditComponent);
     this.#eventEditComponent = null;
@@ -70,7 +70,7 @@ export default class NewEventPresenter {
   }
 
   #formSubmitHandler = (event) => {
-    this.#handleDataChange(
+    this.#onDataChange(
       UserAction.ADD_EVENT,
       UpdateType.MINOR,
       event

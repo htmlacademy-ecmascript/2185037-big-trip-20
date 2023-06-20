@@ -62,17 +62,17 @@ export default class BoardPresenter {
       eventListContainer: this.#eventListComponent.element,
       destinationsModel: this.#destinationsModel,
       offersModel: this.#offersModel,
-      onDataChange: this.#handleViewAction,
-      onDestroy: this.#handleNewEventDestroy
+      onDataChange: this.#viewActionHandler,
+      onDestroy: this.#newEventDestroyHandler
     });
 
-    this.#eventsModel.addObserver(this.#handleModelEvent);
-    this.#filterModel.addObserver(this.#handleModelEvent);
+    this.#eventsModel.addObserver(this.#modelEventHandler);
+    this.#filterModel.addObserver(this.#modelEventHandler);
   }
 
   init(){
     this.#newEventButton = new NewEventButtonView({
-      onClick: this.#handleNewEventButtonClick
+      onClick: this.#newEventButtonClickHandler
     });
     render(this.#newEventButton, this.#newEventButtonContainer);
 
@@ -92,8 +92,8 @@ export default class BoardPresenter {
       container: this.#eventListComponent.element,
       destinationsModel: this.#destinationsModel,
       offersModel: this.#offersModel,
-      onDataChange: this.#handleViewAction,
-      onModeChange: this.#handleModeChange
+      onDataChange: this.#viewActionHandler,
+      onModeChange: this.#modeChangeHandler
     });
 
     eventPresenter.init(event);
@@ -101,7 +101,7 @@ export default class BoardPresenter {
     this.#eventPresenters.set(event.id, eventPresenter);
   }
 
-  #handleSortTypeChange = (sortType) => {
+  #sortTypeChangeHandler = (sortType) => {
     if (this.#currentSortType === sortType) {
       return;
     }
@@ -112,7 +112,7 @@ export default class BoardPresenter {
     this.#renderBoard();
   };
 
-  #handleViewAction = async (actionType, updateType, update) => {
+  #viewActionHandler = async (actionType, updateType, update) => {
     this.#uiBlocker.block();
 
     switch (actionType) {
@@ -145,7 +145,7 @@ export default class BoardPresenter {
     this.#uiBlocker.unblock();
   };
 
-  #handleModelEvent = (updateType, data) => {
+  #modelEventHandler = (updateType, data) => {
     switch (updateType) {
       case UpdateType.PATCH:
         this.#eventPresenters.get(data.id).init(data);
@@ -170,7 +170,7 @@ export default class BoardPresenter {
     render(this.#loadingComponent, this.#container, RenderPosition.BEFOREEND);
   }
 
-  #handleModeChange = () => {
+  #modeChangeHandler = () => {
     this.#newEventPresenter.destroy();
     this.#eventPresenters.forEach((presenter) => presenter.resetView());
   };
@@ -204,7 +204,7 @@ export default class BoardPresenter {
 
     this.#sortComponent = new SortView({
       currentSortType: this.#currentSortType,
-      onSortTypeChange: this.#handleSortTypeChange
+      onSortTypeChange: this.#sortTypeChangeHandler
     });
 
     if(prevSortComponent){
@@ -255,13 +255,13 @@ export default class BoardPresenter {
     this.#newEventPresenter.init();
   }
 
-  #handleNewEventButtonClick = () => {
+  #newEventButtonClickHandler = () => {
     this.#isCreating = true;
     this.createEvent();
     this.#newEventButton.setDisabled(true);
   };
 
-  #handleNewEventDestroy = () => {
+  #newEventDestroyHandler = () => {
     this.#isCreating = false;
     this.#newEventButton.setDisabled(false);
 
