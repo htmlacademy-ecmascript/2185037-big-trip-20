@@ -231,10 +231,10 @@ export default class EventEditView extends AbstractStatefulView {
 
     this.element.querySelector('form').addEventListener('submit', this.#formSubmitHandler);
     this.element.querySelectorAll('.event__type-input').forEach((element) => {
-      element.addEventListener('change', this.#typeInputClick);
+      element.addEventListener('change', this.#typeInputClickHandler);
     });
-    this.element.querySelector('.event__input--price').addEventListener('change', this.#priceInputChange);
-    this.element.querySelector('.event__input--destination').addEventListener('change', this.#destinationInputChange);
+    this.element.querySelector('.event__input--price').addEventListener('change', this.#priceInputChangeHandler);
+    this.element.querySelector('.event__input--destination').addEventListener('change', this.#destinationInputChangeHandler);
     this.element.querySelector('.event__reset-btn').addEventListener('click', this.#deleteButtonClickHanlder);
 
     const offerBlock = this.element.querySelector('.event__available-offers');
@@ -277,6 +277,20 @@ export default class EventEditView extends AbstractStatefulView {
     );
   };
 
+  removeElement = () => {
+    super.removeElement();
+
+    if(this.#datepickerFrom){
+      this.#datepickerFrom.destroy();
+      this.#datepickerFrom = null;
+    }
+
+    if(this.#datepickerTo){
+      this.#datepickerTo.destroy();
+      this.#datepickerTo = null;
+    }
+  };
+
   #dateFromChangeHandler = ([userDate]) => {
     this._setState({
       event: {
@@ -297,20 +311,6 @@ export default class EventEditView extends AbstractStatefulView {
     this.#datepickerFrom.set('maxDate', this._state.event.dateTo);
   };
 
-  removeElement = () => {
-    super.removeElement();
-
-    if(this.#datepickerFrom){
-      this.#datepickerFrom.destroy();
-      this.#datepickerFrom = null;
-    }
-
-    if(this.#datepickerTo){
-      this.#datepickerTo.destroy();
-      this.#datepickerTo = null;
-    }
-  };
-
   #formSubmitHandler = (evt) => {
     evt.preventDefault();
     this.#onFormSubmit(EventEditView.parseStateToEvent(this._state));
@@ -326,7 +326,7 @@ export default class EventEditView extends AbstractStatefulView {
     this.#onResetClick();
   };
 
-  #typeInputClick = (evt) => {
+  #typeInputClickHandler = (evt) => {
     evt.preventDefault();
 
     this.updateElement({
@@ -351,7 +351,7 @@ export default class EventEditView extends AbstractStatefulView {
     });
   };
 
-  #priceInputChange = (evt) => {
+  #priceInputChangeHandler = (evt) => {
     evt.preventDefault();
 
     this._setState({
@@ -362,7 +362,7 @@ export default class EventEditView extends AbstractStatefulView {
     });
   };
 
-  #destinationInputChange = (evt) => {
+  #destinationInputChangeHandler = (evt) => {
     evt.preventDefault();
 
     const selectedDestination = this.#destinations.find((destination) => destination.name === evt.target.value);

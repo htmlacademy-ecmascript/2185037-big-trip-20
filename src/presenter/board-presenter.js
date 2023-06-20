@@ -70,6 +70,14 @@ export default class BoardPresenter {
     this.#filterModel.addObserver(this.#modelEventHandler);
   }
 
+  get events(){
+    this.#filterType = this.#filterModel.filter;
+    const events = this.#eventsModel.events;
+    const filteredEvents = filter[this.#filterType](events);
+
+    return sort[this.#currentSortType](filteredEvents);
+  }
+
   init(){
     this.#newEventButton = new NewEventButtonView({
       onClick: this.#newEventButtonClickHandler
@@ -77,14 +85,6 @@ export default class BoardPresenter {
     render(this.#newEventButton, this.#newEventButtonContainer);
 
     this.#renderBoard();
-  }
-
-  get events(){
-    this.#filterType = this.#filterModel.filter;
-    const events = this.#eventsModel.events;
-    const filteredEvents = filter[this.#filterType](events);
-
-    return sort[this.#currentSortType](filteredEvents);
   }
 
   #renderEvent(event){
@@ -101,79 +101,9 @@ export default class BoardPresenter {
     this.#eventPresenters.set(event.id, eventPresenter);
   }
 
-  #sortTypeChangeHandler = (sortType) => {
-    if (this.#currentSortType === sortType) {
-      return;
-    }
-
-    this.#currentSortType = sortType;
-
-    this.#clearBoard();
-    this.#renderBoard();
-  };
-
-  #viewActionHandler = async (actionType, updateType, update) => {
-    this.#uiBlocker.block();
-
-    switch (actionType) {
-      case UserAction.UPDATE_EVENT:
-        this.#eventPresenters.get(update.id).setSaving();
-        try {
-          await this.#eventsModel.update(updateType, update);
-        } catch (error) {
-          this.#eventPresenters.get(update.id).setAborting();
-        }
-        break;
-      case UserAction.ADD_EVENT:
-        this.#newEventPresenter.setSaving();
-        try {
-          await this.#eventsModel.add(updateType, update);
-        } catch (error) {
-          this.#newEventPresenter.setAborting();
-        }
-        break;
-      case UserAction.DELETE_EVENT:
-        this.#eventPresenters.get(update.id).setDeleting();
-        try {
-          await this.#eventsModel.delete(updateType,update);
-        } catch (error) {
-          this.#eventPresenters.get(update.id).setAborting();
-        }
-        break;
-    }
-
-    this.#uiBlocker.unblock();
-  };
-
-  #modelEventHandler = (updateType, data) => {
-    switch (updateType) {
-      case UpdateType.PATCH:
-        this.#eventPresenters.get(data.id).init(data);
-        break;
-      case UpdateType.MINOR:
-        this.#clearBoard();
-        this.#renderBoard();
-        break;
-      case UpdateType.MAJOR:
-        this.#clearBoard({resetSortType: true});
-        this.#renderBoard();
-        break;
-      case UpdateType.INIT:
-        this.#isLoading = false;
-        remove(this.#loadingComponent);
-        this.#renderBoard();
-        break;
-    }
-  };
-
   #renderLoading(){
     render(this.#loadingComponent, this.#container, RenderPosition.BEFOREEND);
   }
-
-  #modeChangeHandler = () => {
-    this.#newEventPresenter.destroy();
-    this.#eventPresenters.forEach((presenter) => presenter.resetView());
-  };
 
   #clearEventList(){
     this.#newEventPresenter.destroy();
@@ -254,6 +184,76 @@ export default class BoardPresenter {
     this.#filterModel.setFilter(UpdateType.MAJOR, FilterType.EVERYTHING);
     this.#newEventPresenter.init();
   }
+
+  #sortTypeChangeHandler = (sortType) => {
+    if (this.#currentSortType === sortType) {
+      return;
+    }
+
+    this.#currentSortType = sortType;
+
+    this.#clearBoard();
+    this.#renderBoard();
+  };
+
+  #viewActionHandler = async (actionType, updateType, update) => {
+    this.#uiBlocker.block();
+
+    switch (actionType) {
+      case UserAction.UPDATE_EVENT:
+        this.#eventPresenters.get(update.id).setSaving();
+        try {
+          await this.#eventsModel.update(updateType, update);
+        } catch (error) {
+          this.#eventPresenters.get(update.id).setAborting();
+        }
+        break;
+      case UserAction.ADD_EVENT:
+        this.#newEventPresenter.setSaving();
+        try {
+          await this.#eventsModel.add(updateType, update);
+        } catch (error) {
+          this.#newEventPresenter.setAborting();
+        }
+        break;
+      case UserAction.DELETE_EVENT:
+        this.#eventPresenters.get(update.id).setDeleting();
+        try {
+          await this.#eventsModel.delete(updateType,update);
+        } catch (error) {
+          this.#eventPresenters.get(update.id).setAborting();
+        }
+        break;
+    }
+
+    this.#uiBlocker.unblock();
+  };
+
+  #modelEventHandler = (updateType, data) => {
+    switch (updateType) {
+      case UpdateType.PATCH:
+        this.#eventPresenters.get(data.id).init(data);
+        break;
+      case UpdateType.MINOR:
+        this.#clearBoard();
+        this.#renderBoard();
+        break;
+      case UpdateType.MAJOR:
+        this.#clearBoard({resetSortType: true});
+        this.#renderBoard();
+        break;
+      case UpdateType.INIT:
+        this.#isLoading = false;
+        remove(this.#loadingComponent);
+        this.#renderBoard();
+        break;
+    }
+  };
+
+  #modeChangeHandler = () => {
+    this.#newEventPresenter.destroy();
+    this.#eventPresenters.forEach((presenter) => presenter.resetView());
+  };
 
   #newEventButtonClickHandler = () => {
     this.#isCreating = true;

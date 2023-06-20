@@ -18,12 +18,12 @@ export default class NewEventButtonView extends AbstractStatefulView {
     return createNewEventButtonTemplate();
   }
 
+  setDisabled(bool){
+    this.element.disabled = bool;
+  }
+
   #clickHandler = (evt) => {
     evt.preventDefault();
     this.#onClick();
   };
-
-  setDisabled(bool){
-    this.element.disabled = bool;
-  }
 }
