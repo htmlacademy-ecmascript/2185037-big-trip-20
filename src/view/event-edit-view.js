@@ -106,7 +106,7 @@ function createPhotosList(pictures){
 }
 
 function createEventEditTemplate({state, destinations, offers, editType}){
-  const {event, isDeleting, isDisabled, isSaving} = state;
+  const {event, isDeleting, isDisabled, isSaving, isDisabledSubmit} = state;
   const {basePrice, dateFrom, dateTo, type} = event;
 
   const destination = destinations.find((item) => item.id === event.destination);
@@ -161,7 +161,7 @@ function createEventEditTemplate({state, destinations, offers, editType}){
               value="${he.encode(basePrice.toString())}">
           </div>
 
-          <button class="event__save-btn  btn  btn--blue" type="submit" ${isDisabled ? 'disabled' : ''}>
+          <button class="event__save-btn  btn  btn--blue" type="submit" ${isDisabled || isDisabledSubmit ? 'disabled' : ''}>
             ${isSaving ? 'Saving...' : 'Save'}
           </button>
           <button class="event__reset-btn" type="reset" ${isDisabled ? 'disabled' : ''}>
@@ -354,11 +354,12 @@ export default class EventEditView extends AbstractStatefulView {
   #priceInputChangeHandler = (evt) => {
     evt.preventDefault();
 
-    this._setState({
+    this.updateElement({
       event: {
         ...this._state.event,
-        basePrice: evt.target.value
-      }
+        basePrice: evt.target.value,
+      },
+      isDisabledSubmit: parseInt(evt.target.value, 10) === 0
     });
   };
 
@@ -381,7 +382,8 @@ export default class EventEditView extends AbstractStatefulView {
     event,
     isDisabled: false,
     isSaving: false,
-    isDeleting: false
+    isDeleting: false,
+    isDisabledSubmit: false
   });
 
   static parseStateToEvent = (state) => {
@@ -390,6 +392,7 @@ export default class EventEditView extends AbstractStatefulView {
     delete event.isDeleting;
     delete event.isDisabled;
     delete event.isSaving;
+    delete event.isDisabledSubmit;
 
     return event;
   };

@@ -1,6 +1,7 @@
 import { remove, render, RenderPosition } from '../framework/render.js';
 import EventEditView from '../view/event-edit-view.js';
 import { UserAction, UpdateType, EditType } from '../const.js';
+import { escKeyDownHandler } from '../utils/event.js';
 
 export default class NewEventPresenter {
   #eventListContainer = null;
@@ -37,7 +38,7 @@ export default class NewEventPresenter {
     document.addEventListener('keydown', this.#escKeyDownHandler);
   }
 
-  destroy(){
+  destroy = () => {
     if(this.#eventEditComponent === null){
       return;
     }
@@ -48,7 +49,7 @@ export default class NewEventPresenter {
     this.#eventEditComponent = null;
 
     document.removeEventListener('keydown', this.#escKeyDownHandler);
-  }
+  };
 
   setSaving(){
     this.#eventEditComponent.updateElement({
@@ -81,10 +82,5 @@ export default class NewEventPresenter {
     this.destroy();
   };
 
-  #escKeyDownHandler = (evt) => {
-    if (evt.key === 'Escape' || evt.key === 'Esc') {
-      evt.preventDefault();
-      this.destroy();
-    }
-  };
+  #escKeyDownHandler = (evt) => escKeyDownHandler(evt, this.destroy, this.#escKeyDownHandler);
 }

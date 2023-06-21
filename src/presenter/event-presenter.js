@@ -2,7 +2,7 @@ import { render, replace, remove } from '../framework/render.js';
 import EventView from '../view/event-view.js';
 import EventEditView from '../view/event-edit-view.js';
 import { UpdateType, UserAction } from '../const.js';
-import { isDatesEqual, isPricesEqual } from '../utils/event.js';
+import { isDatesEqual, isPricesEqual, escKeyDownHandler } from '../utils/event.js';
 
 const Mode = {
   DEFAULT: 'DEFAULT',
@@ -139,13 +139,7 @@ export default class EventPresenter {
     this.#mode = Mode.DEFAULT;
   };
 
-  #escKeyDownHandler = (evt) => {
-    if (evt.key === 'Escape') {
-      evt.preventDefault();
-      this.#replaceFormToEvent();
-      document.removeEventListener('keydown', this.#escKeyDownHandler);
-    }
-  };
+  #escKeyDownHandler = (evt) => escKeyDownHandler(evt, this.#replaceFormToEvent, this.#escKeyDownHandler);
 
   #editClickHandler = () => {
     this.#replaceEventToForm();
