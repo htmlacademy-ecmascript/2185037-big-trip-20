@@ -5,8 +5,8 @@ import { escKeyDownHandler } from '../utils/event.js';
 
 export default class NewEventPresenter {
   #eventListContainer = null;
-  #onDataChange = null;
-  #onDestroy = null;
+  #handleDataChange = null;
+  #handleDestroy = null;
   #offersModel = null;
   #destinationsModel = null;
 
@@ -16,8 +16,8 @@ export default class NewEventPresenter {
     this.#eventListContainer = eventListContainer;
     this.#destinationsModel = destinationsModel;
     this.#offersModel = offersModel;
-    this.#onDataChange = onDataChange;
-    this.#onDestroy = onDestroy;
+    this.#handleDataChange = onDataChange;
+    this.#handleDestroy = onDestroy;
   }
 
   init(){
@@ -43,7 +43,7 @@ export default class NewEventPresenter {
       return;
     }
 
-    this.#onDestroy();
+    this.#handleDestroy();
 
     remove(this.#eventEditComponent);
     this.#eventEditComponent = null;
@@ -71,7 +71,7 @@ export default class NewEventPresenter {
   }
 
   #formSubmitHandler = (event) => {
-    this.#onDataChange(
+    this.#handleDataChange(
       UserAction.ADD_EVENT,
       UpdateType.MINOR,
       event

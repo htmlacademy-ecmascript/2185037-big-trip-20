@@ -174,7 +174,7 @@ function createEventEditTemplate({state, destinations, offers, editType}){
               value="${he.encode(basePrice.toString())}">
           </div>
 
-          <button class="event__save-btn  btn  btn--blue" type="submit" ${isDisabled || isDisabledSubmit ? 'disabled' : ''}>
+          <button class="event__save-btn  btn  btn--blue" type="submit" ${isDisabled || isDisabledSubmit || basePrice === 0 ? 'disabled' : ''}>
             ${isSaving ? 'Saving...' : 'Save'}
           </button>
           <button class="event__reset-btn" type="reset" ${isDisabled ? 'disabled' : ''}>
@@ -196,9 +196,9 @@ export default class EventEditView extends AbstractStatefulView {
 
   #destinations = null;
   #offers = null;
-  #onFormSubmit = null;
-  #onResetClick = null;
-  #onDeleteClick = null;
+  #handleFormSubmit = null;
+  #handleResetClick = null;
+  #handleDeleteClick = null;
 
   #datepickerFrom = null;
   #datepickerTo = null;
@@ -212,9 +212,9 @@ export default class EventEditView extends AbstractStatefulView {
 
     this.#destinations = destinations;
     this.#offers = offers;
-    this.#onFormSubmit = onFormSubmit;
-    this.#onResetClick = onResetClick;
-    this.#onDeleteClick = onDeleteClick;
+    this.#handleFormSubmit = onFormSubmit;
+    this.#handleResetClick = onResetClick;
+    this.#handleDeleteClick = onDeleteClick;
     this.#type = type;
 
     this._restoreHandlers();
@@ -320,17 +320,17 @@ export default class EventEditView extends AbstractStatefulView {
 
   #formSubmitHandler = (evt) => {
     evt.preventDefault();
-    this.#onFormSubmit(EventEditView.parseStateToEvent(this._state));
+    this.#handleFormSubmit(EventEditView.parseStateToEvent(this._state));
   };
 
   #deleteButtonClickHanlder = (evt) => {
     evt.preventDefault();
-    this.#onDeleteClick(EventEditView.parseStateToEvent(this._state));
+    this.#handleDeleteClick(EventEditView.parseStateToEvent(this._state));
   };
 
   #resetButtonClickHandler = (evt) => {
     evt.preventDefault();
-    this.#onResetClick();
+    this.#handleResetClick();
   };
 
   #typeInputClickHandler = (evt) => {
