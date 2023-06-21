@@ -1,6 +1,4 @@
 import ApiService from '../framework/api-service.js';
-import { Buffer } from 'buffer';
-
 
 const Method = {
   GET: 'GET',
@@ -86,6 +84,6 @@ export default class EventsApiService extends ApiService {
   }
 
   static getStringBasicAuth(){
-    return `Basic ${Buffer.from(`${DATA_AUTH.USERNAME}:${DATA_AUTH.PASSWORD}`).toString('base64')}`;
+    return `Basic ${window.btoa(`${DATA_AUTH.USERNAME}:${DATA_AUTH.PASSWORD}`)}`;
   }
 }
