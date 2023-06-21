@@ -19,7 +19,6 @@
     "@babel/core": "7.21.4",
     "@babel/preset-env": "7.21.4",
     "babel-loader": "9.1.2",
-    "buffer": "6.0.3",
     "copy-webpack-plugin": "11.0.0",
     "css-loader": "6.7.3",
     "eslint": "8.38.0",
@@ -37,7 +36,6 @@
   "dependencies": {
     "dayjs": "1.11.7",
     "flatpickr": "4.6.13",
-    "he": "1.2.0",
-    "buffer": "6.0.3"
+    "he": "1.2.0"
   }
 }

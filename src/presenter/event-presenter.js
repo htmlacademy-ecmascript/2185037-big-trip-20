@@ -20,8 +20,8 @@ export default class EventPresenter {
   #event = null;
   #mode = Mode.DEFAULT;
 
-  #onDataChange = null;
-  #onModeChange = null;
+  #handleDataChange = null;
+  #handleModeChange = null;
 
   constructor({
     container,
@@ -33,8 +33,8 @@ export default class EventPresenter {
     this.#container = container;
     this.#destinationsModel = destinationsModel;
     this.#offersModel = offersModel;
-    this.#onDataChange = onDataChange;
-    this.#onModeChange = onModeChange;
+    this.#handleDataChange = onDataChange;
+    this.#handleModeChange = onModeChange;
   }
 
   init(event){
@@ -108,7 +108,8 @@ export default class EventPresenter {
       this.#eventEditComponent.updateElement({
         isDisabled: false,
         isDeleting: false,
-        isSaving: false
+        isSaving: false,
+        isDisabledSubmit: false
       });
     };
 
@@ -129,7 +130,7 @@ export default class EventPresenter {
   #replaceEventToForm = () => {
     replace(this.#eventEditComponent, this.#eventComponent);
     document.addEventListener('keydown', this.#escKeyDownHandler);
-    this.#onModeChange();
+    this.#handleModeChange();
     this.#mode = Mode.EDITING;
   };
 
@@ -139,7 +140,7 @@ export default class EventPresenter {
     this.#mode = Mode.DEFAULT;
   };
 
-  #escKeyDownHandler = (evt) => escKeyDownHandler(evt, this.#replaceFormToEvent, this.#escKeyDownHandler);
+  #escKeyDownHandler = (evt) => escKeyDownHandler(evt, this.#resetButtonClickHandler);
 
   #editClickHandler = () => {
     this.#replaceEventToForm();
@@ -148,7 +149,7 @@ export default class EventPresenter {
   #formSubmitHandler = (update) => {
     const isMinorUpdate = isDatesEqual(this.#event.dateFrom, update.dateFrom) || isDatesEqual(this.#event.dateTo, update.dateTo) || isPricesEqual(this.#event.basePrice, update.basePrice);
 
-    this.#onDataChange(
+    this.#handleDataChange(
       UserAction.UPDATE_EVENT,
       isMinorUpdate ? UpdateType.MINOR : UpdateType.PATCH,
       update
@@ -156,7 +157,7 @@ export default class EventPresenter {
   };
 
   #deleteClickHandler = (event) => {
-    this.#onDataChange(
+    this.#handleDataChange(
       UserAction.DELETE_EVENT,
       UpdateType.MINOR,
       event,
@@ -164,11 +165,12 @@ export default class EventPresenter {
   };
 
   #resetButtonClickHandler = () => {
+    this.#eventEditComponent.reset(this.#event);
     this.#replaceFormToEvent();
   };
 
   #favoriteClickHandler = () => {
-    this.#onDataChange(
+    this.#handleDataChange(
       UserAction.UPDATE_EVENT,
       UpdateType.MINOR,
       {...this.#event, isFavorite: !this.#event.isFavorite}

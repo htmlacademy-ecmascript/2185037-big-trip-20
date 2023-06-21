@@ -59,9 +59,11 @@ function createDestinationList(event, destinations, type, isDisabled){
 
 function createOffersList(event, offers, isDisabled){
   const offersByType = offers.find((offer) => offer.type === event.type)?.offers;
-  if(offersByType === undefined){
-    return;
+
+  if(offersByType.length < 1){
+    return '';
   }
+
   const offersByIds = [...offersByType.filter((offer) => event.offers.find((id) => offer.id === id))];
 
   return (
@@ -103,6 +105,17 @@ function createPhotosList(pictures){
       ${pictures.map(({src, description}) => `<img class="event__photo" src="${src}" alt="${description}">`).join('')}
     </div>`
   );
+}
+
+function createDestinationTemplate(destination){
+  return `
+  <section class="event__section  event__section--destination">
+    <h3 class="event__section-title  event__section-title--destination">${ destination?.description ? 'Destination' : ''}</h3>
+    <p class="event__destination-description">${ destination?.description ?? '' }</p>
+    <div class="event__photos-container">
+      ${createPhotosList(destination?.pictures ?? false)}
+    </div>
+  </section>`;
 }
 
 function createEventEditTemplate({state, destinations, offers, editType}){
@@ -161,7 +174,7 @@ function createEventEditTemplate({state, destinations, offers, editType}){
               value="${he.encode(basePrice.toString())}">
           </div>
 
-          <button class="event__save-btn  btn  btn--blue" type="submit" ${isDisabled || isDisabledSubmit ? 'disabled' : ''}>
+          <button class="event__save-btn  btn  btn--blue" type="submit" ${isDisabled || isDisabledSubmit || basePrice === 0 ? 'disabled' : ''}>
             ${isSaving ? 'Saving...' : 'Save'}
           </button>
           <button class="event__reset-btn" type="reset" ${isDisabled ? 'disabled' : ''}>
@@ -172,13 +185,7 @@ function createEventEditTemplate({state, destinations, offers, editType}){
         </header>
         <section class="event__details">
           ${createOffersList(event, offers, isDisabled)}
-          <section class="event__section  event__section--destination">
-            <h3 class="event__section-title  event__section-title--destination">Destination</h3>
-            <p class="event__destination-description">${ destination?.description ?? '' }</p>
-            <div class="event__photos-container">
-              ${createPhotosList(destination?.pictures ?? false)}
-            </div>
-          </section>
+          ${destination?.description ? createDestinationTemplate(destination) : ''}
         </section>
       </form>
     </li>`
@@ -189,9 +196,9 @@ export default class EventEditView extends AbstractStatefulView {
 
   #destinations = null;
   #offers = null;
-  #onFormSubmit = null;
-  #onResetClick = null;
-  #onDeleteClick = null;
+  #handleFormSubmit = null;
+  #handleResetClick = null;
+  #handleDeleteClick = null;
 
   #datepickerFrom = null;
   #datepickerTo = null;
@@ -205,9 +212,9 @@ export default class EventEditView extends AbstractStatefulView {
 
     this.#destinations = destinations;
     this.#offers = offers;
-    this.#onFormSubmit = onFormSubmit;
-    this.#onResetClick = onResetClick;
-    this.#onDeleteClick = onDeleteClick;
+    this.#handleFormSubmit = onFormSubmit;
+    this.#handleResetClick = onResetClick;
+    this.#handleDeleteClick = onDeleteClick;
     this.#type = type;
 
     this._restoreHandlers();
@@ -222,7 +229,7 @@ export default class EventEditView extends AbstractStatefulView {
     });
   }
 
-  reset = (event) => this.updateElement({event});
+  reset = (event) => this.updateElement(EventEditView.parseEventToState({event}));
 
   _restoreHandlers = () => {
     if(this.#type === EditType.EDITING){
@@ -313,17 +320,17 @@ export default class EventEditView extends AbstractStatefulView {
 
   #formSubmitHandler = (evt) => {
     evt.preventDefault();
-    this.#onFormSubmit(EventEditView.parseStateToEvent(this._state));
+    this.#handleFormSubmit(EventEditView.parseStateToEvent(this._state));
   };
 
   #deleteButtonClickHanlder = (evt) => {
     evt.preventDefault();
-    this.#onDeleteClick(EventEditView.parseStateToEvent(this._state));
+    this.#handleDeleteClick(EventEditView.parseStateToEvent(this._state));
   };
 
   #resetButtonClickHandler = (evt) => {
     evt.preventDefault();
-    this.#onResetClick();
+    this.#handleResetClick();
   };
 
   #typeInputClickHandler = (evt) => {
