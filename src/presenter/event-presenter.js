@@ -108,7 +108,8 @@ export default class EventPresenter {
       this.#eventEditComponent.updateElement({
         isDisabled: false,
         isDeleting: false,
-        isSaving: false
+        isSaving: false,
+        isDisabledSubmit: false
       });
     };
 
