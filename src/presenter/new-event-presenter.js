@@ -82,5 +82,5 @@ export default class NewEventPresenter {
     this.destroy();
   };
 
-  #escKeyDownHandler = (evt) => escKeyDownHandler(evt, this.destroy, this.#escKeyDownHandler);
+  #escKeyDownHandler = (evt) => escKeyDownHandler(evt, this.destroy);
 }

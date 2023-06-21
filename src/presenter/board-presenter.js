@@ -169,7 +169,7 @@ export default class BoardPresenter {
       return;
     }
 
-    if(!this.#eventsModel.hasEvents() && !this.#isCreating){
+    if(!this.events.length > 0 && !this.#isCreating){
       this.#renderEventEmpty();
       return;
     }

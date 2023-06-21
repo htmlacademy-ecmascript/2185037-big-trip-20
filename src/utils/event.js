@@ -36,8 +36,8 @@ function humanizeEventTime(time) {
 function humanizeEventDurationTime(dateFrom, dateTo){
   const timeDiffMs = dayjs(dateTo).diff(dateFrom);
 
-  if(dayjs.duration(timeDiffMs).asDays() > 1){
-    return dayjs(timeDiffMs).utc().format(DAY_DURATION_FORMAT);
+  if(dayjs.duration(timeDiffMs).asDays() >= 1){
+    return dayjs.duration(timeDiffMs).format(DAY_DURATION_FORMAT);
   }
 
   if(dayjs.duration(timeDiffMs).asMinutes() > 59){
@@ -56,7 +56,7 @@ function isEventPast(event){
 }
 
 function isEventPresent(event){
-  return (dayjs().isAfter(event.dateFrom) && dayjs(event).isBefore(event.dateTo));
+  return (dayjs().isAfter(event.dateFrom) && dayjs().isBefore(event.dateTo));
 }
 
 function isDatesEqual(dateA, dateB) {
@@ -81,11 +81,10 @@ function getEventsPriceDiff(eventA, eventB){
   return eventB.basePrice - eventA.basePrice;
 }
 
-function escKeyDownHandler(evt, cb, handler){
+function escKeyDownHandler(evt, cb){
   if (evt.key === 'Escape' || evt.key === 'Esc') {
     evt.preventDefault();
     cb();
-    document.removeEventListener('keydown', handler);
   }
 }
 

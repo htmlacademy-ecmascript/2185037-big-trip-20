@@ -229,7 +229,7 @@ export default class EventEditView extends AbstractStatefulView {
     });
   }
 
-  reset = (event) => this.updateElement({event});
+  reset = (event) => this.updateElement(EventEditView.parseEventToState({event}));
 
   _restoreHandlers = () => {
     if(this.#type === EditType.EDITING){

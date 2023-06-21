@@ -140,7 +140,7 @@ export default class EventPresenter {
     this.#mode = Mode.DEFAULT;
   };
 
-  #escKeyDownHandler = (evt) => escKeyDownHandler(evt, this.#replaceFormToEvent, this.#escKeyDownHandler);
+  #escKeyDownHandler = (evt) => escKeyDownHandler(evt, this.#resetButtonClickHandler);
 
   #editClickHandler = () => {
     this.#replaceEventToForm();
@@ -165,6 +165,7 @@ export default class EventPresenter {
   };
 
   #resetButtonClickHandler = () => {
+    this.#eventEditComponent.reset(this.#event);
     this.#replaceFormToEvent();
   };
 

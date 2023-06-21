@@ -9,6 +9,7 @@ const EmptyEventTextType = {
 };
 
 function createEventListTemplate(filterType){
+  console.log(filterType);
   return `<p class="trip-events__msg">${EmptyEventTextType[filterType]}</p>`;
 }
 
